@@ -65,6 +65,14 @@
       margin-bottom: 20px;
     }
 
+    .welcome h2 {
+      margin-bottom: 8px;
+    }
+
+    .welcome p {
+      color: #666;
+    }
+
     .google-btn {
       width: 100%;
       padding: 15px;
@@ -92,6 +100,13 @@
       color: #777;
       margin-top: 18px;
     }
+
+    #status {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+      color: #087f3f;
+    }
   </style>
 </head>
 
@@ -118,6 +133,8 @@
         🔵 Google দিয়ে শুরু করুন
       </button>
 
+      <div id="status"></div>
+
       <div class="safe">
         🔒 আপনার তথ্য নিরাপদভাবে সংরক্ষণ করা হবে
       </div>
@@ -138,6 +155,7 @@
 
 
     const googleLogin = document.getElementById("googleLogin");
+    const status = document.getElementById("status");
 
 
     googleLogin.addEventListener("click", async () => {
@@ -145,7 +163,8 @@
       const provider = new GoogleAuthProvider();
 
       googleLogin.disabled = true;
-      googleLogin.innerText = "Login হচ্ছে...";
+      googleLogin.innerText = "⏳ Login হচ্ছে...";
+      status.innerText = "";
 
 
       try {
@@ -154,22 +173,34 @@
 
         const user = result.user;
 
-        alert("স্বাগতম " + (user.displayName || "ব্যবহারকারী"));
+
+        status.innerText = "✅ Login সফল হয়েছে";
 
 
-        // Login সফল হলে Customer Home Page-এ যাবে
-        window.location.href = "./home.html";
+        /*
+          Google Login সফল।
+          এখন Customer Home Page-এ পাঠানো হবে।
+        */
+
+        setTimeout(() => {
+
+          window.location.href =
+            "https://olihasan3.github.io/Islami-khidma-app2026/home.html";
+
+        }, 500);
 
 
       } catch (error) {
 
-        console.error(error);
+        console.error("Google Login Error:", error);
 
         googleLogin.disabled = false;
         googleLogin.innerText = "🔵 Google দিয়ে শুরু করুন";
 
+        status.innerText = "❌ Login করা যায়নি";
+
         alert(
-          "Google Login করা যায়নি। আবার চেষ্টা করুন।\n\n" +
+          "Google Login করা যায়নি।\n\n" +
           error.message
         );
 
@@ -180,4 +211,4 @@
   </script>
 
 </body>
-</html>
+  </html>
