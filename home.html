@@ -65,7 +65,14 @@
       margin-top: 8px;
       color: #555;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
+    }
+
+    .place-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #087f3f;
+      margin-top: 10px;
     }
 
     .gps-btn {
@@ -176,7 +183,7 @@
   </div>
 
 
-  <!-- GPS -->
+  <!-- GPS + Place Name -->
 
   <div class="location">
 
@@ -187,6 +194,11 @@
     <div id="locationStatus">
       GPS অবস্থান নেওয়া হয়নি।
     </div>
+
+    <div
+      id="placeName"
+      class="place-name"
+    ></div>
 
     <button
       class="gps-btn"
@@ -314,7 +326,7 @@
   </div>
 
 
-  <!-- Firebase -->
+  <!-- Firebase + GPS -->
 
   <script type="module">
 
@@ -332,6 +344,9 @@
 
     const locationStatus =
       document.getElementById("locationStatus");
+
+    const placeName =
+      document.getElementById("placeName");
 
     const gpsBtn =
       document.getElementById("gpsBtn");
@@ -402,21 +417,17 @@
 
 
     /*
-      GPS Function
+      GPS Button
     */
 
     gpsBtn.addEventListener(
       "click",
       function () {
 
-        /*
-          প্রথমেই বোঝানো হবে
-          যে বাটন কাজ করেছে
-        */
-
         locationStatus.innerText =
-          "⏳ GPS চালু করার চেষ্টা হচ্ছে...";
+          "⏳ আপনার অবস্থান খোঁজা হচ্ছে...";
 
+        placeName.innerText = "";
 
         gpsBtn.disabled = true;
 
@@ -425,7 +436,7 @@
 
 
         /*
-          Browser GPS আছে কিনা
+          GPS আছে কিনা
         */
 
         if (
@@ -433,7 +444,7 @@
         ) {
 
           locationStatus.innerText =
-            "❌ এই ব্রাউজারে GPS/Location সুবিধা পাওয়া যাচ্ছে না।";
+            "❌ এই ব্রাউজারে Location সুবিধা নেই।";
 
           gpsBtn.disabled = false;
 
@@ -451,7 +462,7 @@
 
         navigator.geolocation.getCurrentPosition(
 
-          function (position) {
+          async function (position) {
 
             const latitude =
               position.coords.latitude;
@@ -466,7 +477,7 @@
 
 
             /*
-              LocalStorage-এ GPS রাখা
+              GPS তথ্য সংরক্ষণ
             */
 
             localStorage.setItem(
@@ -486,21 +497,202 @@
 
 
             /*
-              Screen-এ GPS দেখানো
+              GPS পাওয়া গেছে
             */
 
             locationStatus.innerHTML =
-              "✅ আপনার অবস্থান পাওয়া গেছে!" +
-              "<br><br>" +
-              "📍 Latitude: " +
-              latitude.toFixed(6) +
-              "<br>" +
-              "📍 Longitude: " +
-              longitude.toFixed(6) +
+              "✅ আপনার অবস্থান পাওয়া গেছে।" +
               "<br>" +
               "🎯 Accuracy: প্রায় " +
               accuracy +
               " মিটার";
+
+
+            placeName.innerText =
+              "⏳ স্থানটির নাম খোঁজা হচ্ছে...";
+
+
+            /*
+              OpenStreetMap Nominatim
+              Reverse Geocoding
+            */
+
+            try {
+
+              const url =
+                "https://nominatim.openstreetmap.org/reverse" +
+                "?format=jsonv2" +
+                "&lat=" +
+                encodeURIComponent(latitude) +
+                "&lon=" +
+                encodeURIComponent(longitude) +
+                "&zoom=18" +
+                "&addressdetails=1";
+
+
+              const response =
+                await fetch(url, {
+                  headers: {
+                    "Accept":
+                      "application/json"
+                  }
+                });
+
+
+              if (!response.ok) {
+                throw new Error(
+                  "Location name request failed"
+                );
+              }
+
+
+              const data =
+                await response.json();
+
+
+              /*
+                Address থেকে নাম বের করা
+              */
+
+              const address =
+                data.address || {};
+
+
+              const parts = [];
+
+
+              if (
+                address.road
+              ) {
+                parts.push(
+                  address.road
+                );
+              }
+
+              if (
+                address.neighbourhood
+              ) {
+                parts.push(
+                  address.neighbourhood
+                );
+              }
+
+              if (
+                address.village
+              ) {
+                parts.push(
+                  address.village
+                );
+              }
+
+              if (
+                address.suburb
+              ) {
+                parts.push(
+                  address.suburb
+                );
+              }
+
+              if (
+                address.town
+              ) {
+                parts.push(
+                  address.town
+                );
+              }
+
+              if (
+                address.city
+              ) {
+                parts.push(
+                  address.city
+                );
+              }
+
+              if (
+                address.municipality &&
+                !parts.includes(
+                  address.municipality
+                )
+              ) {
+                parts.push(
+                  address.municipality
+                );
+              }
+
+
+              /*
+                Duplicate বাদ
+              */
+
+              const uniqueParts =
+                [...new Set(parts)];
+
+
+              if (
+                uniqueParts.length > 0
+              ) {
+
+                const finalPlace =
+                  uniqueParts.join(
+                    ", "
+                  );
+
+
+                placeName.innerText =
+                  "📍 " +
+                  finalPlace;
+
+
+                /*
+                  স্থানীয় নাম সংরক্ষণ
+                */
+
+                localStorage.setItem(
+                  "khidma_place_name",
+                  finalPlace
+                );
+
+              }
+
+              else if (
+                data.display_name
+              ) {
+
+                placeName.innerText =
+                  "📍 " +
+                  data.display_name;
+
+
+                localStorage.setItem(
+                  "khidma_place_name",
+                  data.display_name
+                );
+
+              }
+
+              else {
+
+                placeName.innerText =
+                  "📍 স্থানটির নাম পাওয়া যায়নি।";
+
+              }
+
+
+            }
+
+            catch (error) {
+
+              console.error(
+                "Place Name Error:",
+                error
+              );
+
+
+              placeName.innerText =
+                "⚠️ GPS পাওয়া গেছে, কিন্তু স্থানটির নাম পাওয়া যায়নি।";
+
+            }
 
 
             gpsBtn.disabled = false;
@@ -513,14 +705,9 @@
 
           function (error) {
 
-            console.log(
-              "GPS Error Code:",
-              error.code
-            );
-
-            console.log(
+            console.error(
               "GPS Error:",
-              error.message
+              error
             );
 
 
@@ -530,64 +717,37 @@
               "📍 আবার GPS চেষ্টা করুন";
 
 
-            /*
-              Permission সমস্যা
-            */
-
             if (
               error.code === 1
             ) {
 
-              locationStatus.innerHTML =
-                "❌ Location Permission বন্ধ আছে।" +
-                "<br><br>" +
-                "ফোনের Browser Settings থেকে Location Permission Allow করুন।";
+              locationStatus.innerText =
+                "❌ Location Permission বন্ধ আছে। ফোনের Browser Settings থেকে Location Permission Allow করুন।";
 
             }
-
-
-            /*
-              Position পাওয়া যাচ্ছে না
-            */
 
             else if (
               error.code === 2
             ) {
 
-              locationStatus.innerHTML =
-                "❌ আপনার অবস্থান পাওয়া যাচ্ছে না।" +
-                "<br><br>" +
-                "ফোনের Location/GPS চালু করে আবার চেষ্টা করুন।";
+              locationStatus.innerText =
+                "❌ আপনার অবস্থান পাওয়া যাচ্ছে না। ফোনের Location/GPS চালু করে আবার চেষ্টা করুন।";
 
             }
-
-
-            /*
-              Timeout
-            */
 
             else if (
               error.code === 3
             ) {
 
-              locationStatus.innerHTML =
-                "⏳ GPS-এর উত্তর পেতে বেশি সময় লাগছে।" +
-                "<br><br>" +
-                "Location চালু করে আবার চেষ্টা করুন।";
+              locationStatus.innerText =
+                "⏳ GPS-এর উত্তর পেতে বেশি সময় লাগছে। আবার চেষ্টা করুন।";
 
             }
 
-
-            /*
-              অন্য সমস্যা
-            */
-
             else {
 
-              locationStatus.innerHTML =
-                "❌ GPS অবস্থান নেওয়া যায়নি।" +
-                "<br><br>" +
-                "আবার চেষ্টা করুন।";
+              locationStatus.innerText =
+                "❌ GPS অবস্থান নেওয়া যায়নি। আবার চেষ্টা করুন।";
 
             }
 
@@ -605,7 +765,6 @@
       }
 
     );
-
 
   </script>
 
@@ -645,4 +804,4 @@
 
 </body>
 
-  </html>
+    </html>
