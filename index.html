@@ -3,358 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ইসলামী খিদমাহ - Home</title>
+    <title>ইসলামী খিদমাহ - লগইন ও ফেস ভেরিফিকেশন</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Hind Siliguri', sans-serif; }
-        #map { width: 100%; height: 280px; border-radius: 12px; z-index: 1; }
-    </style>
+    <style>body { font-family: 'Hind Siliguri', sans-serif; }</style>
 </head>
-<body class="bg-gray-50 text-gray-800 pb-24">
+<body class="bg-gray-50 text-gray-800 flex items-center justify-center min-h-screen p-4">
 
-    <!-- হেডার -->
-    <header class="bg-white border-b border-emerald-100 sticky top-0 z-50 shadow-sm">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-md">
-            <div class="flex items-center space-x-2">
-                <span class="text-2xl">☪️</span>
-                <div>
-                    <h1 class="font-bold text-emerald-800 text-base leading-tight">ইসলামী খিদমাহ</h1>
-                    <p class="text-[10px] text-gray-500">আপনার প্রয়োজন, আমাদের খিদমাহ</p>
-                </div>
-            </div>
-            <div id="welcome" class="text-xs bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-full font-semibold border border-emerald-200">
-                লগইন চেক হচ্ছে...
-            </div>
+    <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-sm border border-gray-100 space-y-6">
+        
+        <!-- লোগো ও হেডার -->
+        <div class="text-center space-y-1">
+            <span class="text-4xl">☪️</span>
+            <h1 class="font-bold text-emerald-900 text-xl">ইসলামী খিদমাহ</h1>
+            <p class="text-xs text-gray-500">নিরাপদ ও নির্ভরযোগ্য খিদমাহ পাওয়ার জন্য ভেরিফিকেশন সম্পন্ন করুন</p>
         </div>
-    </header>
 
-    <!-- মূল কন্টেন্ট -->
-    <main class="container mx-auto px-4 py-4 max-w-md">
-
-        <!-- লোকেশন ও ম্যাপ কার্ড -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-4">
-            <div class="font-bold text-emerald-900 text-base mb-2 flex items-center justify-between">
-                <span>📍 আপনার বর্তমান অবস্থান</span>
-                <span class="text-xs text-emerald-600 font-normal">জয়পুরহাট</span>
-            </div>
-            <div id="locationStatus" class="text-sm text-gray-600 mb-2">
-                GPS অবস্থান নেওয়া হয়নি।
-            </div>
-            <div id="placeName" class="p-3 bg-emerald-50 rounded-xl text-emerald-800 font-semibold text-sm mb-3" style="display:none;"></div>
-            
-            <button class="w-full bg-emerald-700 text-white py-3 rounded-xl font-bold text-sm shadow hover:bg-emerald-800 transition" id="gpsBtn" type="button">
-                📍 আমার বর্তমান অবস্থান নিন
+        <!-- ধাপ ১: গুগল লগইন -->
+        <div id="loginSection" class="space-y-3">
+            <button onclick="googleLogin()" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-2xl font-bold text-sm shadow-sm hover:bg-gray-50 transition">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                Google দিয়ে লগইন করুন
             </button>
-            
-            <div id="map" class="mt-3"></div>
         </div>
 
-        <!-- সার্চ বক্স -->
-        <div class="mb-4">
-            <div class="relative">
-                <input type="text" id="searchBox" placeholder="কী প্রয়োজন? লিখুন (যেমন: বাজার, ওষুধ)..." class="w-full p-3.5 pl-11 bg-white rounded-xl shadow-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm">
-                <span class="absolute left-4 top-3.5 text-gray-400 text-lg">🔍</span>
+        <!-- ধাপ ২: লাইভ ফেস ভেরিফিকেশন (লগইন হওয়ার পর দেখাবে) -->
+        <div id="faceVerificationSection" class="space-y-4 hidden">
+            <div class="text-center">
+                <h3 class="font-bold text-emerald-900 text-sm">👤 লাইভ ফেস ভেরিফিকেশন</h3>
+                <p id="instructionText" class="text-xs text-gray-600 mt-1">ক্যামেরার সামনে তাকান...</p>
             </div>
-        </div>
 
-        <!-- কাছাকাছি ড্রাইভার সেকশন -->
-        <div class="mb-4">
-            <h2 class="text-sm font-bold text-emerald-900 mb-3 px-1">🛺 কাছাকাছি Online চালক</h2>
-            <div id="driverList">
-                <div class="bg-white p-4 rounded-xl shadow-sm text-center text-sm text-gray-500 border border-gray-100">
-                    ⏳ আগে আপনার বর্তমান অবস্থান নিন।
+            <!-- ক্যামেরা প্রিভিউ বক্স -->
+            <div class="relative w-full h-64 bg-black rounded-2xl overflow-hidden shadow-inner flex items-center justify-center">
+                <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
+                <div class="absolute inset-0 border-4 border-emerald-500 rounded-2xl pointer-events-none opacity-50 flex items-center justify-center">
+                    <div class="w-36 h-48 border-2 border-dashed border-white rounded-full"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- সেবাসমূহ (Grid) -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-            <h3 class="text-sm font-bold mb-3 text-emerald-900 border-b pb-2">আমাদের সেবাসমূহ</h3>
-            <div class="grid grid-cols-4 gap-3 text-center">
-                <button onclick="serviceClick('বাজার')" class="flex flex-col items-center p-2 rounded-xl hover:bg-emerald-50 transition">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🛒</div>
-                    <span class="text-[11px] font-semibold text-gray-700">বাজার</span>
-                </button>
-                <button onclick="serviceClick('রিকশা/অটো')" class="flex flex-col items-center p-2 rounded-xl hover:bg-emerald-50 transition">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🛺</div>
-                    <span class="text-[11px] font-semibold text-gray-700">রিকশা/অটো</span>
-                </button>
-                <button onclick="serviceClick('খাবার')" class="flex flex-col items-center p-2 rounded-xl hover:bg-emerald-50 transition">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🍱</div>
-                    <span class="text-[11px] font-semibold text-gray-700">খাবার</span>
-                </button>
-                <button onclick="serviceClick('ওষুধ')" class="flex flex-col items-center p-2 rounded-xl hover:bg-emerald-50 transition">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">💊</div>
-                    <span class="text-[11px] font-semibold text-gray-700">ওষুধ</span>
-                </button>
-                <button onclick="serviceClick('পার্সেল')" class="flex flex-col items-center p-2 rounded-xl hover:bg-emerald-50 transition">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">📦</div>
-                    <span class="text-[11px] font-semibold text-gray-700">পার্সেল</span>
-                </button>
-                <button onclick="serviceClick('কাজের লোক')" class="flex flex-col items-center p-2 rounded-xl hover:bg-emerald-50 transition">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">👷</div>
-                    <span class="text-[11px] font-semibold text-gray-700">কাজের লোক</span>
-                </button>
-                <button onclick="serviceClick('গাড়ি')" class="flex flex-col items-center p-2 rounded-xl hover:bg-emerald-50 transition">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🚗</div>
-                    <span class="text-[11px] font-semibold text-gray-700">গাড়ি</span>
-                </button>
-                <button onclick="serviceClick('দোকান')" class="flex flex-col items-center p-2 rounded-xl hover:bg-emerald-50 transition">
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🏪</div>
-                    <span class="text-[11px] font-semibold text-gray-700">দোকান</span>
-                </button>
+            <!-- প্রোগ্রেস ইন্ডিকেটর -->
+            <div class="flex justify-between text-xs font-semibold text-gray-500 px-2">
+                <span id="step1" class="text-emerald-700">১. মাথা উঁচু</span>
+                <span id="step2">২. চোখ মিটিমিটি</span>
+                <span id="step3">৩. স্মাইল</span>
             </div>
+
+            <button id="startVerifyBtn" onclick="startFaceScan()" class="w-full bg-emerald-700 text-white py-3 rounded-2xl font-bold text-sm shadow hover:bg-emerald-800 transition">
+                ভেরিফিকেশন শুরু করুন
+            </button>
         </div>
 
-    </main>
-
-    <!-- সার্ভিস বুকিং পপআপ মডাল -->
-    <div id="bookingModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl relative">
-            <button onclick="closeBookingModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl font-bold">✕</button>
-            
-            <h3 id="modalTitle" class="text-base font-bold text-emerald-900 mb-3 border-b pb-2">সার্ভিস বুকিং</h3>
-            
-            <div class="space-y-3 text-sm">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">পিকআপ (বর্তমান অবস্থান)</label>
-                    <input type="text" id="pickupLocation" class="w-full p-2.5 bg-gray-50 border rounded-xl text-xs" readonly value="লোকেশন নেওয়া হয়নি">
-                </div>
-                
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">কোথায় যেতে চান / বিস্তারিত ঠিকানা</label>
-                    <input type="text" id="destinationBox" placeholder="যেমন: বাসস্ট্যান্ড, হাসপাতাল বা বাজার..." class="w-full p-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-600">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">আপনার নোট বা মন্তব্য (ঐচ্ছিক)</label>
-                    <textarea id="bookingNote" placeholder="যেমন: দ্রুত আসতে হবে..." class="w-full p-2.5 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-600" rows="2"></textarea>
-                </div>
-
-                <button onclick="confirmBooking()" class="w-full bg-emerald-700 text-white py-3 rounded-xl font-bold text-sm shadow hover:bg-emerald-800 transition mt-2">
-                    🚀 রিকোয়েস্ট কনফার্ম করুন
-                </button>
-            </div>
+        <!-- সিকিউরিটি নোট (আপনার শর্ত অনুযায়ী) -->
+        <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100 text-[11px] text-emerald-800 text-center leading-relaxed">
+            🔒 ভেরিফিকেশনের জন্য আপনার ডেটা কঠোরভাবে সংরক্ষিত থাকবে, কেউ দেখতে পারবে না।
         </div>
+
     </div>
 
-    <!-- ফিক্সড বটম নেভিগেশন -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2.5 shadow-lg max-w-md mx-auto z-50">
-        <div class="flex justify-around items-center text-gray-500">
-            <button class="flex flex-col items-center text-emerald-700">
-                <span class="text-lg">🏠</span>
-                <span class="text-[10px] font-bold">Home</span>
-            </button>
-            <button onclick="orders()" class="flex flex-col items-center hover:text-emerald-700">
-                <span class="text-lg">📦</span>
-                <span class="text-[10px]">Orders</span>
-            </button>
-            <button onclick="profile()" class="flex flex-col items-center hover:text-emerald-700">
-                <span class="text-lg">👤</span>
-                <span class="text-[10px]">আমি</span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    
-    <!-- জাভাস্ক্রিপ্ট লজিক -->
+    <!-- ফায়ারবেস এবং লজিক স্ক্রিপ্ট -->
     <script type="module">
-        import { auth, db } from "./firebase.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-        import { collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+        import { auth } from "./firebase.js";
+        import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
-        const welcome = document.getElementById("welcome");
-        const locationStatus = document.getElementById("locationStatus");
-        const placeName = document.getElementById("placeName");
-        const gpsBtn = document.getElementById("gpsBtn");
-        const driverList = document.getElementById("driverList");
+        const loginSection = document.getElementById("loginSection");
+        const faceVerificationSection = document.getElementById("faceVerificationSection");
+        const videoElement = document.getElementById("videoElement");
+        const instructionText = document.getElementById("instructionText");
+        
+        let videoStream = null;
 
-        let currentUser = null;
-        let userLatitude = null;
-        let userLongitude = null;
-        let userMarker = null;
-        let driverMarkers = [];
-        let selectedServiceName = "";
-
-        // ম্যাপ ইনিশিয়ালাইজ (জয়পুরহাট সেন্টার)
-        let map = L.map("map").setView([25.7439, 89.2752], 13);
-        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            maxZoom: 19,
-            attribution: "&copy; OpenStreetMap"
-        }).addTo(map);
-
-        setTimeout(() => { map.invalidateSize(); }, 500);
-
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                welcome.innerText = "অতিথি মোড";
-                return;
-            }
-            currentUser = user;
-            welcome.innerText = user.displayName || "ব্যবহারকারী";
-        });
-
-        // সার্ভিস ক্লিক করলে মডাল ওপেন হবে
-        window.serviceClick = function(serviceName) {
-            selectedServiceName = serviceName;
-            document.getElementById("modalTitle").innerText = serviceName + " বুকিং করুন";
-            
-            const placeText = placeName.innerText || "লোকেশন সিলেক্ট করা হয়নি";
-            document.getElementById("pickupLocation").value = placeText;
-            
-            document.getElementById("bookingModal").classList.remove("hidden");
-        }
-
-        // মডাল বন্ধ করা
-        window.closeBookingModal = function() {
-            document.getElementById("bookingModal").classList.add("hidden");
-        }
-
-        // রিকোয়েস্ট কনফার্ম করে ফায়ারবেসে পাঠানো
-        window.confirmBooking = async function() {
-            const destination = document.getElementById("destinationBox").value;
-            const note = document.getElementById("bookingNote").value;
-
-            if (!destination) {
-                alert("দয়া করে গন্তব্য বা বিস্তারিত ঠিকানা লিখুন!");
-                return;
-            }
-
-            if (userLatitude === null || userLongitude === null) {
-                alert("দয়া করে আগে 'আমার বর্তমান অবস্থান নিন' বাটনে ক্লিক করে জিপিএস লোকেশন অন করুন।");
-                return;
-            }
-
+        // গুগল লগইন ফাংশন
+        window.googleLogin = async function() {
+            const provider = new GoogleAuthProvider();
             try {
-                await addDoc(collection(db, "requests"), {
-                    userId: currentUser ? currentUser.uid : "guest",
-                    userName: currentUser ? (currentUser.displayName || "গ্রাহক") : "অতিথি গ্রাহক",
-                    serviceType: selectedServiceName,
-                    pickupLat: userLatitude,
-                    pickupLng: userLongitude,
-                    destination: destination,
-                    note: note,
-                    status: "pending",
-                    createdAt: new Date().toISOString()
-                });
-
-                alert("আলহামদুলিল্লাহ! আপনার " + selectedServiceName + " রিকোয়েস্ট সফলভাবে পাঠানো হয়েছে।");
-                closeBookingModal();
-                
-                document.getElementById("destinationBox").value = "";
-                document.getElementById("bookingNote").value = "";
-
-            } catch (error) {
-                console.error("Booking Error: ", error);
-                alert("রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
-            }
-        }
-
-        function distanceKm(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
-        async function findNearbyDrivers() {
-            if (userLatitude === null || userLongitude === null) return;
-            driverList.innerHTML = '<div class="bg-white p-4 rounded-xl shadow-sm text-center text-sm text-gray-500">⏳ কাছাকাছি চালক খোঁজা হচ্ছে...</div>';
-            try {
-                const driversQuery = query(collection(db, "users"), where("driverOnline", "==", true));
-                const snapshot = await getDocs(driversQuery);
-                
-                driverMarkers.forEach(marker => map.removeLayer(marker));
-                driverMarkers = [];
-                let drivers = [];
-
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    if (typeof data.latitude !== "number" || typeof data.longitude !== "number") return;
-                    const distance = distanceKm(userLatitude, userLongitude, data.latitude, data.longitude);
-                    if (distance <= 5) {
-                        drivers.push({ id: docSnap.id, vehicleType: data.vehicleType || "যানবাহন", latitude: data.latitude, longitude: data.longitude, distance });
-                    }
-                });
-
-                drivers.sort((a, b) => a.distance - b.distance);
-
-                if (drivers.length === 0) {
-                    driverList.innerHTML = '<div class="bg-white p-4 rounded-xl shadow-sm text-center text-sm text-gray-500">😔 ৫ কিমি এর মধ্যে কোনো Online চালক নেই।</div>';
-                    return;
+                const result = await signInWithPopup(auth, provider);
+                if (result.user) {
+                    loginSection.classList.add("hidden");
+                    faceVerificationSection.classList.remove("hidden");
+                    initCamera();
                 }
-
-                driverList.innerHTML = "";
-                drivers.forEach((driver, index) => {
-                    const card = document.createElement("div");
-                    card.className = "bg-white p-4 rounded-xl shadow-sm mb-2 border border-gray-100 text-sm";
-                    const distanceText = driver.distance < 1 ? Math.round(driver.distance * 1000) + " মিটার" : driver.distance.toFixed(1) + " কিমি";
-                    
-                    card.innerHTML = `<div class="flex justify-between font-bold mb-1"><span>🛺 চালক ${index + 1}</span><span class="text-emerald-600">🟢 Online</span></div>` +
-                                     `<div class="text-gray-600">যানবাহন: ${driver.vehicleType}<br>দূরত্ব: <span class="text-emerald-700 font-bold">${distanceText}</span></div>`;
-                    driverList.appendChild(card);
-
-                    const marker = L.marker([driver.latitude, driver.longitude]).addTo(map);
-                    marker.bindPopup(`<b>🛺 Online চালক</b><br>যানবাহন: ${driver.vehicleType}<br>দূরত্ব: ${distanceText}`);
-                    driverMarkers.push(marker);
-                });
             } catch (error) {
-                console.error(error);
-                driverList.innerHTML = '<div class="bg-white p-4 rounded-xl shadow-sm text-center text-sm text-red-500">⚠️ চালকের অবস্থান লোড করতে সমস্যা হয়েছে।</div>';
+                console.error("Login Error: ", error);
+                alert("লগইন করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
             }
         }
 
-        gpsBtn.addEventListener("click", function() {
-            locationStatus.innerText = "⏳ আপনার বর্তমান অবস্থান খোঁজা হচ্ছে...";
-            gpsBtn.disabled = true;
-            gpsBtn.innerText = "⏳ অবস্থান নেওয়া হচ্ছে...";
-
-            if (!navigator.geolocation) {
-                locationStatus.innerText = "❌ আপনার ব্রাউজারে GPS সুবিধা নেই।";
-                gpsBtn.disabled = false;
-                gpsBtn.innerText = "📍 আবার চেষ্টা করুন";
-                return;
+        // ক্যামেরা অন করার ফাংশন
+        async function initCamera() {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = videoStream;
+            } catch (err) {
+                alert("ক্যামেরা পারমিশন পাওয়া যায়নি! দয়া করে ক্যামেরা অন করুন।");
             }
+        }
 
-            navigator.geolocation.getCurrentPosition(async function(position) {
-                userLatitude = position.coords.latitude;
-                userLongitude = position.coords.longitude;
-                const accuracy = Math.round(position.coords.accuracy);
+        // ফেস স্ক্যান ও ধাপে ধাপে নির্দেশনা সিমুলেশন
+        window.startFaceScan = function() {
+            const btn = document.getElementById("startVerifyBtn");
+            btn.disabled = true;
+            btn.innerText = "যাচাই করা হচ্ছে...";
 
-                map.setView([userLatitude, userLongitude], 16);
-                map.invalidateSize();
-
-                if (userMarker) map.removeLayer(userMarker);
+            // স্টেপ ১: মাথা উঁচু করা
+            instructionText.innerText = "দয়া করে সামান্য মাথা উঁচু করুন...";
+            setTimeout(() => {
+                document.getElementById("step1").classList.remove("text-emerald-700");
+                document.getElementById("step2").classList.add("text-emerald-700");
                 
-                userMarker = L.marker([userLatitude, userLongitude]).addTo(map);
-                userMarker.bindPopup("<b>📍 আপনার অবস্থান</b>").openPopup();
+                // স্টেপ ২: চোখ মিটিমিটি করা
+                instructionText.innerText = "এবার চোখ একবার মিটিমিটি (Blink) করুন...";
+                setTimeout(() => {
+                    document.getElementById("step2").classList.remove("text-emerald-700");
+                    document.getElementById("step3").classList.add("text-emerald-700");
+                    
+                    // স্টেপ ৩: স্মাইল দেওয়া
+                    instructionText.innerText = "একটি মিষ্টি হাসি দিন (Smile)...";
+                    setTimeout(() => {
+                        // ক্যামেরা বন্ধ করে দ্বিতীয় ধাপে রিডাইরেক্ট করা
+                        if (videoStream) {
+                            videoStream.getTracks().forEach(track => track.stop());
+                        }
+                        alert("আলহামদুলিল্লাহ! ফেস ভেরিফিকেশন সফল হয়েছে।");
+                        window.location.href = "./register-details.html"; // দ্বিতীয় ধাপের পেজ
+                    }, 2500);
 
-                locationStatus.innerHTML = `✅ GPS অবস্থান পাওয়া গেছে। (Accuracy: ~${accuracy}মি)`;
-                placeName.style.display = "block";
-                placeName.innerText = "📍 আপনার বর্তমান জিপিএস লোকেশন সেট হয়েছে";
-                
-                gpsBtn.disabled = false;
-                gpsBtn.innerText = "🔄 আবার অবস্থান নিন";
-                findNearbyDrivers();
-            }, function(error) {
-                gpsBtn.disabled = false;
-                gpsBtn.innerText = "📍 আবার GPS চেষ্টা করুন";
-                locationStatus.innerText = "❌ GPS অবস্থান নেওয়া যায়নি। ব্রাউজার লোকেশন পারমিশন চেক করুন।";
-            }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 });
-        });
-    </script>
-    <script>
-        function orders() { alert("আপনার Orders এখানে দেখা যাবে।"); }
-        function profile() { window.location.href = "./profile.html"; }
+                }, 2500);
+
+            }, 2500);
+        }
     </script>
 </body>
-                                                                                                                 </html>
-                                                                                                                                                                  
+</html>
