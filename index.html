@@ -54,7 +54,7 @@
             </button>
         </div>
 
-        <!-- সিকিউরিটি নোট (আপনার শর্ত অনুযায়ী) -->
+        <!-- সিকিউরিটি নোট -->
         <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100 text-[11px] text-emerald-800 text-center leading-relaxed">
             🔒 ভেরিফিকেশনের জন্য আপনার ডেটা কঠোরভাবে সংরক্ষিত থাকবে, কেউ দেখতে পারবে না।
         </div>
@@ -64,7 +64,7 @@
     <!-- ফায়ারবেস এবং লজিক স্ক্রিপ্ট -->
     <script type="module">
         import { auth } from "./firebase.js";
-        import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+        import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
         const loginSection = document.getElementById("loginSection");
         const faceVerificationSection = document.getElementById("faceVerificationSection");
@@ -72,66 +72,23 @@
         const instructionText = document.getElementById("instructionText");
         
         let videoStream = null;
+        const provider = new GoogleAuthProvider();
 
-        // গুগল লগইন ফাংশন
-        window.googleLogin = async function() {
-            const provider = new GoogleAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                if (result.user) {
-                    loginSection.classList.add("hidden");
-                    faceVerificationSection.classList.remove("hidden");
-                    initCamera();
+        // পেজ লোড হওয়ার পর রিডাইরেক্ট হয়ে আসলে লগইন চেক করা
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result && result.user) {
+                    showFaceVerification();
                 }
-            } catch (error) {
-                console.error("Login Error: ", error);
-                alert("লগইন করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+            }).catch((error) => {
+                console.error("Redirect Error: ", error);
+            });
+
+        // যদি ইউজার ইতিমধ্যে লগইন করা থাকে
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                showFaceVerification();
             }
-        }
+        });
 
-        // ক্যামেরা অন করার ফাংশন
-        async function initCamera() {
-            try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
-                videoElement.srcObject = videoStream;
-            } catch (err) {
-                alert("ক্যামেরা পারমিশন পাওয়া যায়নি! দয়া করে ক্যামেরা অন করুন।");
-            }
-        }
-
-        // ফেস স্ক্যান ও ধাপে ধাপে নির্দেশনা সিমুলেশন
-        window.startFaceScan = function() {
-            const btn = document.getElementById("startVerifyBtn");
-            btn.disabled = true;
-            btn.innerText = "যাচাই করা হচ্ছে...";
-
-            // স্টেপ ১: মাথা উঁচু করা
-            instructionText.innerText = "দয়া করে সামান্য মাথা উঁচু করুন...";
-            setTimeout(() => {
-                document.getElementById("step1").classList.remove("text-emerald-700");
-                document.getElementById("step2").classList.add("text-emerald-700");
-                
-                // স্টেপ ২: চোখ মিটিমিটি করা
-                instructionText.innerText = "এবার চোখ একবার মিটিমিটি (Blink) করুন...";
-                setTimeout(() => {
-                    document.getElementById("step2").classList.remove("text-emerald-700");
-                    document.getElementById("step3").classList.add("text-emerald-700");
-                    
-                    // স্টেপ ৩: স্মাইল দেওয়া
-                    instructionText.innerText = "একটি মিষ্টি হাসি দিন (Smile)...";
-                    setTimeout(() => {
-                        // ক্যামেরা বন্ধ করে দ্বিতীয় ধাপে রিডাইরেক্ট করা
-                        if (videoStream) {
-                            videoStream.getTracks().forEach(track => track.stop());
-                        }
-                        alert("আলহামদুলিল্লাহ! ফেস ভেরিফিকেশন সফল হয়েছে।");
-                        window.location.href = "./register-details.html"; // দ্বিতীয় ধাপের পেজ
-                    }, 2500);
-
-                }, 2500);
-
-            }, 2500);
-        }
-    </script>
-</body>
-</html>
+        
