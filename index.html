@@ -2,9 +2,13 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>ইসলামী খিদমাহ</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>ইসলামী খিদমাহ - Login</title>
 
   <style>
     * {
@@ -15,26 +19,29 @@
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f1f8f4;
-      color: #123d29;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .container {
+      width: 92%;
       max-width: 420px;
-      margin: auto;
-      min-height: 100vh;
-      padding: 25px 18px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      background: white;
+      padding: 30px 22px;
+      border-radius: 20px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.10);
+      text-align: center;
     }
 
     .logo {
-      width: 85px;
-      height: 85px;
+      width: 90px;
+      height: 90px;
       margin: 0 auto 15px;
       border-radius: 50%;
       background: #087f3f;
-      color: #ffd700;
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -42,70 +49,48 @@
     }
 
     h1 {
-      text-align: center;
-      margin: 5px 0;
+      margin: 10px 0 5px;
       color: #087f3f;
+      font-size: 28px;
     }
 
-    .tagline {
-      text-align: center;
+    .subtitle {
       color: #666;
       margin-bottom: 25px;
+      font-size: 15px;
     }
 
-    .card {
-      background: white;
-      border-radius: 18px;
-      padding: 25px 20px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
-
-    .welcome {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .welcome h2 {
-      margin-bottom: 8px;
-    }
-
-    .welcome p {
-      color: #666;
-    }
-
-    .google-btn {
+    .login-btn {
       width: 100%;
-      padding: 15px;
       border: none;
       border-radius: 12px;
-      background: #087f3f;
-      color: white;
+      padding: 15px;
       font-size: 17px;
       font-weight: bold;
+      background: #087f3f;
+      color: white;
       cursor: pointer;
     }
 
-    .google-btn:active {
-      transform: scale(0.98);
-    }
-
-    .google-btn:disabled {
+    .login-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
 
-    .safe {
-      text-align: center;
-      font-size: 13px;
-      color: #777;
+    #status {
       margin-top: 18px;
+      font-size: 14px;
+      min-height: 20px;
     }
 
-    #status {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 14px;
-      color: #087f3f;
+    .info {
+      margin-top: 25px;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -114,36 +99,35 @@
 
   <div class="container">
 
-    <div class="logo">☪</div>
+    <div class="logo">
+      🤝
+    </div>
 
     <h1>ইসলামী খিদমাহ</h1>
 
-    <div class="tagline">
-      আপনার প্রয়োজন, আমাদের খিদমাহ
+    <div class="subtitle">
+      মানুষের সেবায়, মানুষের পাশে
     </div>
 
-    <div class="card">
+    <button
+      id="googleLogin"
+      class="login-btn"
+    >
+      🔵 Google দিয়ে শুরু করুন
+    </button>
 
-      <div class="welcome">
-        <h2>স্বাগতম</h2>
-        <p>আপনার অ্যাকাউন্ট দিয়ে শুরু করুন</p>
-      </div>
+    <div id="status"></div>
 
-      <button class="google-btn" id="googleLogin">
-        🔵 Google দিয়ে শুরু করুন
-      </button>
-
-      <div id="status"></div>
-
-      <div class="safe">
-        🔒 আপনার তথ্য নিরাপদভাবে সংরক্ষণ করা হবে
-      </div>
-
+    <div class="info">
+      Google দিয়ে Login করার পর আপনার Profile তৈরি করতে হবে।
+      <br>
+      Profile-এ Live Selfie, মোবাইল নম্বর ও ঠিকানা দিতে হবে।
     </div>
 
   </div>
 
 
+  <!-- Firebase Login -->
   <script type="module">
 
     import { auth } from "./firebase.js";
@@ -154,61 +138,96 @@
     } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 
-    const googleLogin = document.getElementById("googleLogin");
-    const status = document.getElementById("status");
+    const googleLogin =
+      document.getElementById("googleLogin");
+
+    const status =
+      document.getElementById("status");
 
 
-    googleLogin.addEventListener("click", async () => {
+    googleLogin.addEventListener(
+      "click",
+      async () => {
 
-      const provider = new GoogleAuthProvider();
-
-      googleLogin.disabled = true;
-      googleLogin.innerText = "⏳ Login হচ্ছে...";
-      status.innerText = "";
-
-
-      try {
-
-        const result = await signInWithPopup(auth, provider);
-
-        const user = result.user;
+        const provider =
+          new GoogleAuthProvider();
 
 
-        status.innerText = "✅ Login সফল হয়েছে";
+        googleLogin.disabled = true;
+
+        googleLogin.innerText =
+          "⏳ Login হচ্ছে...";
+
+        status.innerText = "";
 
 
-        /*
-          Google Login সফল।
-          এখন Customer Home Page-এ পাঠানো হবে।
-        */
+        try {
 
-        setTimeout(() => {
-
-          window.location.href =
-            "https://olihasan3.github.io/Islami-khidma-app2026/home.html";
-
-        }, 500);
+          const result =
+            await signInWithPopup(
+              auth,
+              provider
+            );
 
 
-      } catch (error) {
+          const user =
+            result.user;
 
-        console.error("Google Login Error:", error);
 
-        googleLogin.disabled = false;
-        googleLogin.innerText = "🔵 Google দিয়ে শুরু করুন";
+          console.log(
+            "Login User:",
+            user
+          );
 
-        status.innerText = "❌ Login করা যায়নি";
 
-        alert(
-          "Google Login করা যায়নি।\n\n" +
-          error.message
-        );
+          status.innerText =
+            "✅ Login সফল হয়েছে";
+
+
+          /*
+            গুরুত্বপূর্ণ:
+
+            Login-এর পর Home নয়,
+            সরাসরি Profile Page যাবে।
+          */
+
+          setTimeout(() => {
+
+            window.location.href =
+              "./profile.html";
+
+          }, 500);
+
+
+        } catch (error) {
+
+          console.error(
+            "Google Login Error:",
+            error
+          );
+
+
+          googleLogin.disabled = false;
+
+          googleLogin.innerText =
+            "🔵 Google দিয়ে শুরু করুন";
+
+
+          status.innerText =
+            "❌ Login করা যায়নি";
+
+
+          alert(
+            "Google Login করা যায়নি.\n\n" +
+            error.message
+          );
+
+        }
 
       }
-
-    });
+    );
 
   </script>
 
 </body>
-  </html>
+</html>
