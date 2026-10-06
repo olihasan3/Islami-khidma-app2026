@@ -42,12 +42,46 @@
       font-size: 14px;
     }
 
+    #welcome {
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
     .location {
       background: white;
       margin: 15px;
-      padding: 14px;
-      border-radius: 12px;
+      padding: 16px;
+      border-radius: 14px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .location-title {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    #locationStatus {
+      margin-top: 8px;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .gps-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      background: #087f3f;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .gps-btn:disabled {
+      opacity: 0.6;
     }
 
     .search {
@@ -101,6 +135,7 @@
       justify-content: space-around;
       align-items: center;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 10;
     }
 
     .bottom button {
@@ -115,11 +150,6 @@
       font-weight: bold;
     }
 
-    #welcome {
-      font-size: 14px;
-      margin-top: 5px;
-    }
-
   </style>
 
 </head>
@@ -127,6 +157,8 @@
 
 <body>
 
+
+  <!-- Header -->
 
   <div class="header">
 
@@ -136,34 +168,49 @@
       আপনার প্রয়োজন, আমাদের খিদমাহ
     </p>
 
-    <div id="welcome"></div>
+    <div id="welcome">
+      ব্যবহারকারী যাচাই হচ্ছে...
+    </div>
 
   </div>
 
+
+  <!-- GPS -->
 
   <div class="location">
 
-    📍 আপনার অবস্থান
+    <div class="location-title">
+      📍 আপনার বর্তমান অবস্থান
+    </div>
 
-    <br>
+    <div id="locationStatus">
+      GPS অবস্থান নেওয়া হয়নি।
+    </div>
 
-    <small>
-      লোকেশন নির্বাচন করুন
-    </small>
+    <button
+      class="gps-btn"
+      id="gpsBtn"
+    >
+      📍 আমার বর্তমান অবস্থান নিন
+    </button>
 
   </div>
 
+
+  <!-- Search -->
 
   <div class="search">
 
     <input
       type="text"
-      placeholder="কী প্রয়োজন? লিখুন"
       id="searchBox"
+      placeholder="কী প্রয়োজন? লিখুন"
     >
 
   </div>
 
+
+  <!-- Services -->
 
   <div class="services">
 
@@ -174,7 +221,6 @@
     >
 
       <span>🛒</span>
-
       বাজার
 
     </button>
@@ -186,7 +232,6 @@
     >
 
       <span>🛺</span>
-
       রিকশা/অটো
 
     </button>
@@ -198,7 +243,6 @@
     >
 
       <span>🍱</span>
-
       খাবার
 
     </button>
@@ -210,7 +254,6 @@
     >
 
       <span>💊</span>
-
       ওষুধ
 
     </button>
@@ -222,7 +265,6 @@
     >
 
       <span>📦</span>
-
       পার্সেল
 
     </button>
@@ -234,7 +276,6 @@
     >
 
       <span>👷</span>
-
       কাজের লোক
 
     </button>
@@ -246,7 +287,6 @@
     >
 
       <span>🚗</span>
-
       গাড়ি
 
     </button>
@@ -258,7 +298,6 @@
     >
 
       <span>🏪</span>
-
       দোকান
 
     </button>
@@ -267,44 +306,31 @@
   </div>
 
 
+  <!-- Bottom Navigation -->
+
   <div class="bottom">
 
-
     <button class="active">
-
-      🏠
-      <br>
-
+      🏠<br>
       Home
-
     </button>
 
 
     <button onclick="orders()">
-
-      📋
-      <br>
-
+      📋<br>
       Orders
-
     </button>
 
 
     <button onclick="profile()">
-
-      👤
-      <br>
-
+      👤<br>
       আমি
-
     </button>
-
 
   </div>
 
 
-
-  <!-- Firebase -->
+  <!-- Firebase + GPS -->
 
   <script type="module">
 
@@ -317,12 +343,24 @@
       from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 
+    const welcome =
+      document.getElementById("welcome");
+
+    const locationStatus =
+      document.getElementById("locationStatus");
+
+    const gpsBtn =
+      document.getElementById("gpsBtn");
+
+
+    /*
+      Firebase Login Check
+    */
+
     onAuthStateChanged(
       auth,
       (user) => {
 
-
-        // Google Login নেই
         if (!user) {
 
           window.location.href =
@@ -334,8 +372,7 @@
 
 
         /*
-          Profile সম্পূর্ণ হয়েছে কি না
-          পরীক্ষা করা হচ্ছে।
+          Profile Check
         */
 
         const savedPhone =
@@ -354,11 +391,6 @@
           );
 
 
-        /*
-          Profile অসম্পূর্ণ হলে
-          আবার Profile Page।
-        */
-
         if (
           !savedPhone ||
           !savedAddress ||
@@ -373,11 +405,7 @@
         }
 
 
-        // সব ঠিক থাকলে Home
-
-        document.getElementById(
-          "welcome"
-        ).innerText =
+        welcome.innerText =
           "স্বাগতম, " +
           (
             user.displayName ||
@@ -388,8 +416,161 @@
 
     );
 
-  </script>
 
+    /*
+      GPS Function
+    */
+
+    gpsBtn.addEventListener(
+      "click",
+      () => {
+
+        if (
+          !navigator.geolocation
+        ) {
+
+          locationStatus.innerText =
+            "❌ আপনার ফোনে GPS/Geolocation সাপোর্ট নেই।";
+
+          return;
+
+        }
+
+
+        gpsBtn.disabled = true;
+
+        gpsBtn.innerText =
+          "⏳ GPS অবস্থান নেওয়া হচ্ছে...";
+
+
+        locationStatus.innerText =
+          "📍 আপনার অবস্থান খোঁজা হচ্ছে...";
+
+
+        navigator.geolocation.getCurrentPosition(
+
+          (position) => {
+
+            const latitude =
+              position.coords.latitude;
+
+            const longitude =
+              position.coords.longitude;
+
+            const accuracy =
+              Math.round(
+                position.coords.accuracy
+              );
+
+
+            /*
+              ফোনে সাময়িকভাবে
+              GPS তথ্য রাখা
+            */
+
+            localStorage.setItem(
+              "khidma_latitude",
+              latitude
+            );
+
+            localStorage.setItem(
+              "khidma_longitude",
+              longitude
+            );
+
+
+            localStorage.setItem(
+              "khidma_gps_time",
+              new Date().toISOString()
+            );
+
+
+            locationStatus.innerHTML =
+              "✅ আপনার GPS অবস্থান পাওয়া গেছে।" +
+              "<br><br>" +
+              "Latitude: " +
+              latitude.toFixed(6) +
+              "<br>" +
+              "Longitude: " +
+              longitude.toFixed(6) +
+              "<br>" +
+              "Accuracy: প্রায় " +
+              accuracy +
+              " মিটার";
+
+
+            gpsBtn.disabled = false;
+
+            gpsBtn.innerText =
+              "🔄 আবার অবস্থান নিন";
+
+          },
+
+
+          (error) => {
+
+            console.error(
+              "GPS Error:",
+              error
+            );
+
+
+            gpsBtn.disabled = false;
+
+            gpsBtn.innerText =
+              "📍 আবার GPS চেষ্টা করুন";
+
+
+            if (
+              error.code === 1
+            ) {
+
+              locationStatus.innerText =
+                "❌ Location Permission বন্ধ আছে। ফোনের Settings থেকে Location Permission চালু করুন।";
+
+            }
+
+            else if (
+              error.code === 2
+            ) {
+
+              locationStatus.innerText =
+                "❌ আপনার অবস্থান পাওয়া যাচ্ছে না। GPS/Location চালু করে আবার চেষ্টা করুন।";
+
+            }
+
+            else if (
+              error.code === 3
+            ) {
+
+              locationStatus.innerText =
+                "⏳ GPS-এর সময় শেষ হয়ে গেছে। আবার চেষ্টা করুন।";
+
+            }
+
+            else {
+
+              locationStatus.innerText =
+                "❌ GPS অবস্থান নেওয়া যায়নি। আবার চেষ্টা করুন।";
+
+            }
+
+          },
+
+
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+          }
+
+        );
+
+      }
+
+    );
+
+  </script>
 
 
   <script>
@@ -425,4 +606,4 @@
 
 </body>
 
-  </html>
+      </html>
