@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>ইসলামী খিদমাহ - Driver</title>
+
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f4f7f5;
+  color:#222;
+  padding-bottom:30px;
+}
+
+.header{
+  background:#087f3f;
+  color:white;
+  padding:22px 18px;
+  border-radius:0 0 22px 22px;
+}
+
+.header h1{
+  margin:0;
+  font-size:24px;
+}
+
+.header p{
+  margin:7px 0 0;
+  font-size:14px;
+}
+
+.container{
+  padding:15px;
+}
+
+.card{
+  background:white;
+  padding:18px;
+  border-radius:16px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.user{
+  text-align:center;
+}
+
+.user img{
+  width:75px;
+  height:75px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.user-name{
+  margin-top:8px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+label{
+  display:block;
+  margin-top:14px;
+  font-weight:bold;
+}
+
+select{
+  width:100%;
+  padding:14px;
+  margin-top:8px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:16px;
+}
+
+.status{
+  text-align:center;
+  padding:14px;
+  border-radius:10px;
+  background:#f1f1f1;
+  font-weight:bold;
+  margin-top:15px;
+}
+
+.online{
+  background:#e7f7ed;
+  color:#087f3f;
+}
+
+.offline{
+  background:#f5eeee;
+  color:#b00020;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:12px;
+  border:0;
+  border-radius:10px;
+  background:#087f3f;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+}
+
+button:disabled{
+  opacity:.5;
+}
+
+#map{
+  width:100%;
+  height:350px;
+  border-radius:14px;
+  overflow:hidden;
+  margin-top:12px;
+}
+
+.info{
+  margin-top:12px;
+  padding:12px;
+  background:#f4f7f5;
+  border-radius:10px;
+  line-height:1.7;
+  font-size:14px;
+}
+
+#message{
+  text-align:center;
+  margin-top:12px;
+  font-weight:bold;
+  line-height:1.6;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<div class="header">
+
+<h1>☪️ ইসলামী খিদমাহ</h1>
+
+<p>চালক সেবা</p>
+
+</div>
+
+
+<div class="container">
+
+
+<!-- USER -->
+
+<div class="card user">
+
+<img
+id="userPhoto"
+src=""
+alt="Driver">
+
+<div
+id="userName"
+class="user-name">
+
+চালক যাচাই হচ্ছে...
+
+</div>
+
+</div>
+
+
+<!-- VEHICLE -->
+
+<div class="card">
+
+<label>
+🛺 আপনার যানবাহন
+</label>
+
+<select id="vehicleType">
+
+<option value="">
+যানবাহন নির্বাচন করুন
+</option>
+
+<option value="রিকশা">
+রিকশা
+</option>
+
+<option value="অটো">
+অটো
+</option>
+
+<option value="ইজিবাইক">
+ইজিবাইক
+</option>
+
+</select>
+
+
+<div
+id="status"
+class="status offline">
+
+🔴 Offline
+
+</div>
+
+
+<button
+id="onlineBtn"
+disabled>
+
+🟢 Online হন
+
+</button>
+
+
+<button
+id="offlineBtn"
+disabled
+style="display:none;">
+
+🔴 Offline হন
+
+</button>
+
+
+<div
+id="message">
+</div>
+
+</div>
+
+
+<!-- MAP -->
+
+<div class="card">
+
+<b>
+📍 আপনার বর্তমান অবস্থান
+</b>
+
+<div id="map"></div>
+
+<div
+id="locationInfo"
+class="info">
+
+GPS চালু করা হয়নি।
+
+</div>
+
+</div>
+
+
+</div>
+
+
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script type="module">
+
+
+/* =========================
+   FIREBASE
+========================= */
+
+import { auth } from "./firebase.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+const db =
+  getFirestore();
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const userName =
+  document.getElementById("userName");
+
+const userPhoto =
+  document.getElementById("userPhoto");
+
+const vehicleType =
+  document.getElementById("vehicleType");
+
+const status =
+  document.getElementById("status");
+
+const onlineBtn =
+  document.getElementById("onlineBtn");
+
+const offlineBtn =
+  document.getElementById("offlineBtn");
+
+const locationInfo =
+  document.getElementById("locationInfo");
+
+const message =
+  document.getElementById("message");
+
+
+let currentUser = null;
+
+let watchId = null;
+
+let driverOnline = false;
+
+let driverMarker = null;
+
+
+/* =========================
+   MAP
+========================= */
+
+const map =
+  L.map("map").setView(
+    [25.7439,89.2752],
+    7
+  );
+
+
+L.tileLayer(
+  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom:19,
+
+    attribution:
+      '&copy; OpenStreetMap contributors'
+  }
+).addTo(map);
+
+
+/* =========================
+   LOGIN
+========================= */
+
+onAuthStateChanged(
+  auth,
+  (user)=>{
+
+    if(!user){
+
+      window.location.href =
+        "./index.html";
+
+      return;
+    }
+
+
+    currentUser =
+      user;
+
+
+    userName.innerText =
+      user.displayName ||
+      "চালক";
+
+
+    if(user.photoURL){
+
+      userPhoto.src =
+        user.photoURL;
+
+    }
+
+
+    onlineBtn.disabled =
+      false;
+
+  }
+);
+
+
+/* =========================
+   VEHICLE CHECK
+========================= */
+
+vehicleType.addEventListener(
+  "change",
+  ()=>{
+    if(vehicleType.value){
+
+      onlineBtn.disabled =
+        false;
+
+    }else{
+
+      onlineBtn.disabled =
+        true;
+
+    }
+  }
+);
+
+
+/* =========================
+   ONLINE
+========================= */
+
+onlineBtn.addEventListener(
+  "click",
+  ()=>{
+
+    if(!currentUser){
+
+      message.innerText =
+        "❌ চালক লগইন করা নেই।";
+
+      return;
+    }
+
+
+    if(!vehicleType.value){
+
+      message.innerText =
+        "❌ আগে যানবাহন নির্বাচন করুন।";
+
+      return;
+    }
+
+
+    if(!navigator.geolocation){
+
+      message.innerText =
+        "❌ এই ফোনে GPS নেই।";
+
+      return;
+    }
+
+
+    driverOnline =
+      true;
+
+
+    status.className =
+      "status online";
+
+    status.innerText =
+      "🟢 Online — যাত্রী খোঁজা হচ্ছে";
+
+
+    onlineBtn.style.display =
+      "none";
+
+    offlineBtn.style.display =
+      "block";
+
+
+    message.innerText =
+      "⏳ GPS চালু হচ্ছে...";
+
+
+    /* =========================
+       GPS WATCH
+    ========================= */
+
+    watchId =
+      navigator.geolocation.watchPosition(
+
+        async(position)=>{
+
+          const latitude =
+            position.coords.latitude;
+
+          const longitude =
+            position.coords.longitude;
+
+          const accuracy =
+            Math.round(
+              position.coords.accuracy
+            );
+
+
+          /* =========================
+             MAP
+          ========================= */
+
+          map.setView(
+            [latitude,longitude],
+            17
+          );
+
+
+          if(driverMarker){
+
+            driverMarker.setLatLng(
+              [latitude,longitude]
+            );
+
+          }else{
+
+            driverMarker =
+              L.marker(
+                [latitude,longitude]
+              ).addTo(map);
+
+          }
+
+
+          driverMarker.bindPopup(
+            "<b>🛺 আপনার অবস্থান</b><br>" +
+            vehicleType.value
+          );
+
+
+          /* =========================
+             LOCATION INFO
+          ========================= */
+
+          locationInfo.innerHTML =
+            "🟢 Live GPS চালু আছে<br>" +
+            "🚕 যানবাহন: " +
+            vehicleType.value +
+            "<br>" +
+            "🎯 Accuracy: প্রায় " +
+            accuracy +
+            " মিটার";
+
+
+          message.innerText =
+            "🟢 আপনার Live Location চালু আছে";
+
+
+          /* =========================
+             FIRESTORE
+          ========================= */
+
+          try{
+
+            await setDoc(
+
+              doc(
+                db,
+                "users",
+                currentUser.uid
+              ),
+
+              {
+
+                role:
+                  "driver",
+
+                vehicleType:
+                  vehicleType.value,
+
+                driverOnline:
+                  true,
+
+                latitude:
+                  latitude,
+
+                longitude:
+                  longitude,
+
+                gpsAccuracy:
+                  accuracy,
+
+                gpsUpdatedAt:
+                  new Date()
+
+              },
+
+              {
+                merge:true
+              }
+
+            );
+
+          }
+
+          catch(error){
+
+            console.error(
+              "Firebase Location Error:",
+              error
+            );
+
+            message.innerText =
+              "⚠️ GPS চলছে, কিন্তু Firebase-এ Location Save হয়নি।";
+
+          }
+
+        },
+
+
+        (error)=>{
+
+          console.error(
+            "GPS Error:",
+            error
+          );
+
+
+          message.innerText =
+            "❌ GPS Location পাওয়া যায়নি।";
+
+        },
+
+
+        {
+
+          enableHighAccuracy:true,
+
+          maximumAge:5000,
+
+          timeout:15000
+
+        }
+
+      );
+
+  }
+);
+
+
+/* =========================
+   OFFLINE
+========================= */
+
+offlineBtn.addEventListener(
+  "click",
+  async()=>{
+
+    driverOnline =
+      false;
+
+
+    /* Stop GPS */
+
+    if(watchId !== null){
+
+      navigator.geolocation.clearWatch(
+        watchId
+      );
+
+      watchId =
+        null;
+
+    }
+
+
+    status.className =
+      "status offline";
+
+    status.innerText =
+      "🔴 Offline";
+
+
+    onlineBtn.style.display =
+      "block";
+
+    offlineBtn.style.display =
+      "none";
+
+
+    locationInfo.innerText =
+      "GPS বন্ধ করা হয়েছে।";
+
+
+    message.innerText =
+      "⏳ Offline করা হচ্ছে...";
+
+
+    /* Firebase */
+
+    if(currentUser){
+
+      try{
+
+        await setDoc(
+
+          doc(
+            db,
+            "users",
+            currentUser.uid
+          ),
+
+          {
+
+            driverOnline:
+              false,
+
+            gpsUpdatedAt:
+              new Date()
+
+          },
+
+          {
+            merge:true
+          }
+
+        );
+
+
+        message.innerText =
+          "🔴 আপনি এখন Offline।";
+
+      }
+
+      catch(error){
+
+        console.error(
+          error
+        );
+
+        message.innerText =
+          "⚠️ Offline হয়েছে, কিন্তু Firebase Update হয়নি।";
+
+      }
+
+    }
+
+  }
+);
+
+
+</script>
+
+</body>
+</html>
