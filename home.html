@@ -69,10 +69,14 @@
     }
 
     .place-name {
-      font-size: 18px;
-      font-weight: bold;
-      color: #087f3f;
       margin-top: 10px;
+      padding: 10px;
+      background: #f1f8f4;
+      border-radius: 10px;
+      color: #087f3f;
+      font-size: 17px;
+      font-weight: bold;
+      line-height: 1.5;
     }
 
     .gps-btn {
@@ -183,7 +187,7 @@
   </div>
 
 
-  <!-- GPS + Place Name -->
+  <!-- GPS -->
 
   <div class="location">
 
@@ -198,6 +202,7 @@
     <div
       id="placeName"
       class="place-name"
+      style="display:none;"
     ></div>
 
     <button
@@ -326,7 +331,7 @@
   </div>
 
 
-  <!-- Firebase + GPS -->
+  <!-- Firebase + GPS + Place Name -->
 
   <script type="module">
 
@@ -366,7 +371,6 @@
             "./index.html";
 
           return;
-
         }
 
 
@@ -400,7 +404,6 @@
             "./profile.html";
 
           return;
-
         }
 
 
@@ -412,7 +415,6 @@
           );
 
       }
-
     );
 
 
@@ -425,7 +427,10 @@
       function () {
 
         locationStatus.innerText =
-          "⏳ আপনার অবস্থান খোঁজা হচ্ছে...";
+          "⏳ আপনার বর্তমান অবস্থান খোঁজা হচ্ছে...";
+
+        placeName.style.display =
+          "none";
 
         placeName.innerText = "";
 
@@ -436,12 +441,10 @@
 
 
         /*
-          GPS আছে কিনা
+          Browser GPS Check
         */
 
-        if (
-          !navigator.geolocation
-        ) {
+        if (!navigator.geolocation) {
 
           locationStatus.innerText =
             "❌ এই ব্রাউজারে Location সুবিধা নেই।";
@@ -452,7 +455,6 @@
             "📍 আবার চেষ্টা করুন";
 
           return;
-
         }
 
 
@@ -477,7 +479,7 @@
 
 
             /*
-              GPS তথ্য সংরক্ষণ
+              GPS তথ্য Save
             */
 
             localStorage.setItem(
@@ -501,48 +503,51 @@
             */
 
             locationStatus.innerHTML =
-              "✅ আপনার অবস্থান পাওয়া গেছে।" +
+              "✅ GPS অবস্থান পাওয়া গেছে।" +
               "<br>" +
               "🎯 Accuracy: প্রায় " +
               accuracy +
               " মিটার";
 
 
+            /*
+              এখন স্থানটির নাম খোঁজা হবে
+            */
+
+            placeName.style.display =
+              "block";
+
             placeName.innerText =
-              "⏳ স্থানটির নাম খোঁজা হচ্ছে...";
+              "⏳ আপনার এলাকার নাম খোঁজা হচ্ছে...";
 
 
             /*
-              OpenStreetMap Nominatim
-              Reverse Geocoding
+              BigDataCloud Reverse Geocoding
+
+              এখানে কোনো API Key লাগবে না।
             */
 
             try {
 
-              const url =
-                "https://nominatim.openstreetmap.org/reverse" +
-                "?format=jsonv2" +
-                "&lat=" +
+              const apiUrl =
+                "https://api.bigdatacloud.net/data/reverse-geocode-client" +
+                "?latitude=" +
                 encodeURIComponent(latitude) +
-                "&lon=" +
+                "&longitude=" +
                 encodeURIComponent(longitude) +
-                "&zoom=18" +
-                "&addressdetails=1";
+                "&localityLanguage=bn";
 
 
               const response =
-                await fetch(url, {
-                  headers: {
-                    "Accept":
-                      "application/json"
-                  }
-                });
+                await fetch(apiUrl);
 
 
               if (!response.ok) {
+
                 throw new Error(
-                  "Location name request failed"
+                  "স্থান নাম API কাজ করেনি"
                 );
+
               }
 
 
@@ -551,102 +556,85 @@
 
 
               /*
-                Address থেকে নাম বের করা
+                বিভিন্ন এলাকার নাম বের করা
               */
 
-              const address =
-                data.address || {};
+              const city =
+                data.city ||
+                data.locality ||
+                data.principalSubdivision ||
+                "";
+
+              const locality =
+                data.localityInfo &&
+                data.localityInfo.administrativeArea &&
+                data.localityInfo.administrativeArea.length > 0
+                  ? data.localityInfo.administrativeArea[0].name
+                  : "";
 
 
-              const parts = [];
+              /*
+                Country
+              */
+
+              const country =
+                data.countryName ||
+                "বাংলাদেশ";
+
+
+              /*
+                স্থানটির নাম তৈরি
+              */
+
+              let finalPlace = "";
 
 
               if (
-                address.road
+                city &&
+                country
               ) {
-                parts.push(
-                  address.road
-                );
+
+                finalPlace =
+                  city +
+                  ", " +
+                  country;
+
               }
 
-              if (
-                address.neighbourhood
-              ) {
-                parts.push(
-                  address.neighbourhood
-                );
+              else if (city) {
+
+                finalPlace =
+                  city;
+
               }
 
-              if (
-                address.village
-              ) {
-                parts.push(
-                  address.village
-                );
+              else if (locality) {
+
+                finalPlace =
+                  locality;
+
               }
 
-              if (
-                address.suburb
+              else if (
+                data.displayName
               ) {
-                parts.push(
-                  address.suburb
-                );
-              }
 
-              if (
-                address.town
-              ) {
-                parts.push(
-                  address.town
-                );
-              }
+                finalPlace =
+                  data.displayName;
 
-              if (
-                address.city
-              ) {
-                parts.push(
-                  address.city
-                );
-              }
-
-              if (
-                address.municipality &&
-                !parts.includes(
-                  address.municipality
-                )
-              ) {
-                parts.push(
-                  address.municipality
-                );
               }
 
 
               /*
-                Duplicate বাদ
+                নাম পাওয়া গেলে
               */
 
-              const uniqueParts =
-                [...new Set(parts)];
-
-
-              if (
-                uniqueParts.length > 0
-              ) {
-
-                const finalPlace =
-                  uniqueParts.join(
-                    ", "
-                  );
-
+              if (finalPlace) {
 
                 placeName.innerText =
                   "📍 " +
                   finalPlace;
 
-
-                /*
-                  স্থানীয় নাম সংরক্ষণ
-                */
 
                 localStorage.setItem(
                   "khidma_place_name",
@@ -655,26 +643,10 @@
 
               }
 
-              else if (
-                data.display_name
-              ) {
-
-                placeName.innerText =
-                  "📍 " +
-                  data.display_name;
-
-
-                localStorage.setItem(
-                  "khidma_place_name",
-                  data.display_name
-                );
-
-              }
-
               else {
 
                 placeName.innerText =
-                  "📍 স্থানটির নাম পাওয়া যায়নি।";
+                  "📍 GPS পাওয়া গেছে, কিন্তু এলাকার নাম পাওয়া যায়নি।";
 
               }
 
@@ -690,10 +662,19 @@
 
 
               placeName.innerText =
-                "⚠️ GPS পাওয়া গেছে, কিন্তু স্থানটির নাম পাওয়া যায়নি।";
+                "⚠️ GPS ঠিক আছে, কিন্তু স্থানটির নাম এখন পাওয়া যায়নি।";
+
+
+              /*
+                GPS কিন্তু নষ্ট হয়নি।
+              */
 
             }
 
+
+            /*
+              Button আবার চালু
+            */
 
             gpsBtn.disabled = false;
 
@@ -702,6 +683,10 @@
 
           },
 
+
+          /*
+            GPS Error
+          */
 
           function (error) {
 
@@ -754,6 +739,10 @@
           },
 
 
+          /*
+            GPS Options
+          */
+
           {
             enableHighAccuracy: true,
             timeout: 30000,
@@ -763,8 +752,8 @@
         );
 
       }
-
     );
+
 
   </script>
 
@@ -804,4 +793,4 @@
 
 </body>
 
-    </html>
+  </html>
