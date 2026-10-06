@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="bn">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>ইসলামী খিদমাহ - Home</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -113,164 +119,310 @@
       font-size: 14px;
       margin-top: 5px;
     }
+
   </style>
+
 </head>
+
 
 <body>
 
+
   <div class="header">
+
     <h1>☪️ ইসলামী খিদমাহ</h1>
-    <p>আপনার প্রয়োজন, আমাদের খিদমাহ</p>
+
+    <p>
+      আপনার প্রয়োজন, আমাদের খিদমাহ
+    </p>
+
     <div id="welcome"></div>
+
   </div>
+
 
   <div class="location">
+
     📍 আপনার অবস্থান
+
     <br>
-    <small>লোকেশন নির্বাচন করুন</small>
+
+    <small>
+      লোকেশন নির্বাচন করুন
+    </small>
+
   </div>
 
+
   <div class="search">
+
     <input
       type="text"
       placeholder="কী প্রয়োজন? লিখুন"
       id="searchBox"
     >
+
   </div>
+
 
   <div class="services">
 
-    <button class="service" onclick="serviceClick('বাজার')">
+
+    <button
+      class="service"
+      onclick="serviceClick('বাজার')"
+    >
+
       <span>🛒</span>
+
       বাজার
+
     </button>
 
-    <button class="service" onclick="serviceClick('রিকশা/অটো')">
+
+    <button
+      class="service"
+      onclick="serviceClick('রিকশা/অটো')"
+    >
+
       <span>🛺</span>
+
       রিকশা/অটো
+
     </button>
 
-    <button class="service" onclick="serviceClick('খাবার')">
+
+    <button
+      class="service"
+      onclick="serviceClick('খাবার')"
+    >
+
       <span>🍱</span>
+
       খাবার
+
     </button>
 
-    <button class="service" onclick="serviceClick('ওষুধ')">
+
+    <button
+      class="service"
+      onclick="serviceClick('ওষুধ')"
+    >
+
       <span>💊</span>
+
       ওষুধ
+
     </button>
 
-    <button class="service" onclick="serviceClick('পার্সেল')">
+
+    <button
+      class="service"
+      onclick="serviceClick('পার্সেল')"
+    >
+
       <span>📦</span>
+
       পার্সেল
+
     </button>
 
-    <button class="service" onclick="serviceClick('কাজের লোক')">
+
+    <button
+      class="service"
+      onclick="serviceClick('কাজের লোক')"
+    >
+
       <span>👷</span>
+
       কাজের লোক
+
     </button>
 
-    <button class="service" onclick="serviceClick('গাড়ি')">
+
+    <button
+      class="service"
+      onclick="serviceClick('গাড়ি')"
+    >
+
       <span>🚗</span>
+
       গাড়ি
+
     </button>
 
-    <button class="service" onclick="serviceClick('দোকান')">
+
+    <button
+      class="service"
+      onclick="serviceClick('দোকান')"
+    >
+
       <span>🏪</span>
+
       দোকান
+
     </button>
+
 
   </div>
+
 
   <div class="bottom">
 
+
     <button class="active">
-      🏠<br>
+
+      🏠
+      <br>
+
       Home
+
     </button>
+
 
     <button onclick="orders()">
-      📋<br>
+
+      📋
+      <br>
+
       Orders
+
     </button>
 
+
     <button onclick="profile()">
-      👤<br>
+
+      👤
+      <br>
+
       আমি
+
     </button>
+
 
   </div>
 
 
+
+  <!-- Firebase -->
+
   <script type="module">
 
-    import { initializeApp }
-      from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { auth }
+      from "./firebase.js";
 
     import {
-      getAuth,
       onAuthStateChanged
     }
       from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBa17W7lDjnB4V02sFiG_wJOQOtp3ZYpVU",
-      authDomain: "islami-khidma-app2026.firebaseapp.com",
-      projectId: "islami-khidma-app2026",
-      storageBucket: "islami-khidma-app2026.firebasestorage.app",
-      messagingSenderId: "552980551495",
-      appId: "1:552980551495:web:51787e78d534a60e7d9e62"
-    };
+    onAuthStateChanged(
+      auth,
+      (user) => {
 
 
-    const app = initializeApp(firebaseConfig);
+        // Google Login নেই
+        if (!user) {
 
-    const auth = getAuth(app);
+          window.location.href =
+            "./index.html";
+
+          return;
+
+        }
 
 
-    onAuthStateChanged(auth, (user) => {
+        /*
+          Profile সম্পূর্ণ হয়েছে কি না
+          পরীক্ষা করা হচ্ছে।
+        */
 
-      if (user) {
+        const savedPhone =
+          localStorage.getItem(
+            "khidma_phone"
+          );
 
-        document.getElementById("welcome").innerText =
-          "স্বাগতম, " + (user.displayName || "ব্যবহারকারী");
+        const savedAddress =
+          localStorage.getItem(
+            "khidma_address"
+          );
 
-      } else {
+        const savedSelfie =
+          localStorage.getItem(
+            "khidma_selfie"
+          );
 
-        window.location.href = "index.html";
+
+        /*
+          Profile অসম্পূর্ণ হলে
+          আবার Profile Page।
+        */
+
+        if (
+          !savedPhone ||
+          !savedAddress ||
+          !savedSelfie
+        ) {
+
+          window.location.href =
+            "./profile.html";
+
+          return;
+
+        }
+
+
+        // সব ঠিক থাকলে Home
+
+        document.getElementById(
+          "welcome"
+        ).innerText =
+          "স্বাগতম, " +
+          (
+            user.displayName ||
+            "ব্যবহারকারী"
+          );
 
       }
 
-    });
-
+    );
 
   </script>
+
 
 
   <script>
 
     function serviceClick(service) {
 
-      alert(service + " সার্ভিস খুব শীঘ্রই চালু হবে।");
+      alert(
+        service +
+        " সার্ভিস খুব শীঘ্রই চালু হবে।"
+      );
 
     }
 
 
     function orders() {
 
-      alert("আপনার Orders এখানে দেখা যাবে।");
+      alert(
+        "আপনার Orders এখানে দেখা যাবে।"
+      );
 
     }
 
 
     function profile() {
 
-      alert("আপনার প্রোফাইল এখানে থাকবে।");
+      window.location.href =
+        "./profile.html";
 
     }
 
   </script>
 
+
 </body>
+
   </html>
