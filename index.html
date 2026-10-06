@@ -64,7 +64,7 @@
     <!-- ফায়ারবেস এবং লজিক স্ক্রিপ্ট -->
     <script type="module">
         import { auth } from "./firebase.js";
-        import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+        import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
         const loginSection = document.getElementById("loginSection");
         const faceVerificationSection = document.getElementById("faceVerificationSection");
@@ -74,29 +74,31 @@
         let videoStream = null;
         const provider = new GoogleAuthProvider();
 
-        // পেজ লোড হওয়ার সাথে সাথে চেক করা ইউজার অলরেডি লগইন করা আছে কিনা
+        // গুগল থেকে লগইন করে ফিরে আসার পর রেজাল্ট চেক করা
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result && result.user) {
+                    showFaceVerification();
+                }
+            })
+            .catch((error) => {
+                console.error("Redirect Error: ", error);
+            });
+
+        // ইউজার ইতিমধ্যে লগইন করা থাকলে সরাসরি ফেস ভেরিফিকেশনে নিয়ে যাওয়া
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 showFaceVerification();
             }
         });
 
-        // রিডাইরেক্ট রেজাল্ট হ্যান্ডেল করা
-        getRedirectResult(auth).catch((error) => {
-            console.error("Redirect Error: ", error);
-        });
-
-        // গুগল লগইন ফাংশন (প্রথমে পপআপ ট্রাই করবে, মোবাইল বা ব্রাউজারে সমস্যা হলে অটো রিডাইরেক্ট করবে)
+        // গুগল লগইন (মোবাইল ফ্রেন্ডলি রিডাইরেক্ট মেথড)
         window.googleLogin = async function() {
             try {
-                await signInWithPopup(auth, provider);
+                await signInWithRedirect(auth, provider);
             } catch (error) {
-                console.log("Popup failed, trying redirect...", error);
-                try {
-                    await signInWithRedirect(auth, provider);
-                } catch (err) {
-                    alert("লগইন করতে সমস্যা হয়েছে: " + err.message);
-                }
+                console.error("Login Error: ", error);
+                alert("লগইন করতে সমস্যা হয়েছে: " + error.message);
             }
         }
 
@@ -151,5 +153,5 @@
         }
     </script>
 </body>
-    </html>
+                </html>
     
