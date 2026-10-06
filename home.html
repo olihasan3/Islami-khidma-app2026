@@ -1,897 +1,755 @@
-<!DOCTYPE html>
-<html lang="bn">
+<!DOCTYPE html><html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ইসলামী খিদমাহ - Home</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><style>
+*{box-sizing:border-box}
 
-<title>ইসলামী খিদমাহ - Home</title>
-
-<!-- Leaflet Map -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-
-<style>
-
-* {
-  box-sizing: border-box;
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f4f7f5;
+color:#222;
+padding-bottom:75px;
 }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f7f5;
-  color: #222;
-  padding-bottom: 75px;
+.header{
+background:#087f3f;
+color:white;
+padding:22px 18px;
+border-radius:0 0 22px 22px;
 }
 
-/* Header */
-
-.header {
-  background: #087f3f;
-  color: white;
-  padding: 22px 18px;
-  border-radius: 0 0 22px 22px;
+.header h1{
+margin:0;
+font-size:25px;
 }
 
-.header h1 {
-  margin: 0;
-  font-size: 25px;
+.header p{
+margin:8px 0 0;
+font-size:14px;
 }
 
-.header p {
-  margin: 8px 0 0;
-  font-size: 14px;
+#welcome{
+font-size:14px;
+margin-top:6px;
 }
 
-#welcome {
-  font-size: 14px;
-  margin-top: 6px;
+.location{
+background:white;
+margin:15px;
+padding:16px;
+border-radius:14px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-/* Location Box */
-
-.location {
-  background: white;
-  margin: 15px;
-  padding: 16px;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+.location-title{
+font-weight:bold;
+font-size:17px;
 }
 
-.location-title {
-  font-weight: bold;
-  font-size: 17px;
+#locationStatus{
+margin-top:8px;
+color:#555;
+font-size:14px;
+line-height:1.6;
 }
 
-#locationStatus {
-  margin-top: 8px;
-  color: #555;
-  font-size: 14px;
-  line-height: 1.6;
+.place-name{
+margin-top:10px;
+padding:10px;
+background:#f1f8f4;
+border-radius:10px;
+color:#087f3f;
+font-size:17px;
+font-weight:bold;
+line-height:1.5;
 }
 
-.place-name {
-  margin-top: 10px;
-  padding: 10px;
-  background: #f1f8f4;
-  border-radius: 10px;
-  color: #087f3f;
-  font-size: 17px;
-  font-weight: bold;
-  line-height: 1.5;
+.gps-btn{
+width:100%;
+margin-top:12px;
+padding:13px;
+border:none;
+border-radius:10px;
+background:#087f3f;
+color:white;
+font-size:16px;
+font-weight:bold;
 }
 
-/* GPS Button */
-
-.gps-btn {
-  width: 100%;
-  margin-top: 12px;
-  padding: 13px;
-  border: none;
-  border-radius: 10px;
-  background: #087f3f;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
+.gps-btn:disabled{
+opacity:.6;
 }
 
-.gps-btn:disabled {
-  opacity: 0.6;
+#map{
+width:100%;
+height:320px;
+margin-top:14px;
+border-radius:14px;
+overflow:hidden;
+border:1px solid #ddd;
 }
 
-/* Map */
-
-#map {
-  width: 100%;
-  height: 320px;
-  margin-top: 14px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid #ddd;
+.nearby-title{
+font-size:18px;
+font-weight:bold;
+margin:15px 15px 8px;
 }
 
-/* Search */
-
-.search {
-  margin: 15px;
+#driverList{
+margin:0 15px;
 }
 
-.search input {
-  width: 100%;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  font-size: 16px;
-  outline: none;
+.driver-card{
+background:white;
+padding:15px;
+border-radius:14px;
+margin-bottom:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-/* Services */
-
-.services {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  padding: 15px;
+.driver-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
 }
 
-.service {
-  background: white;
-  border: none;
-  border-radius: 16px;
-  padding: 22px 10px;
-  font-size: 17px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  cursor: pointer;
+.driver-name{
+font-size:17px;
+font-weight:bold;
 }
 
-.service span {
-  display: block;
-  font-size: 30px;
-  margin-bottom: 8px;
+.online-dot{
+color:#087f3f;
+font-weight:bold;
 }
 
-.service:active {
-  transform: scale(0.97);
+.driver-info{
+margin-top:8px;
+font-size:14px;
+line-height:1.7;
+color:#555;
 }
 
-/* Bottom Navigation */
-
-.bottom {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 65px;
-  background: white;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-  z-index: 1000;
+.distance{
+color:#087f3f;
+font-weight:bold;
 }
 
-.bottom button {
-  border: none;
-  background: none;
-  font-size: 14px;
-  color: #555;
+.search{
+margin:15px;
 }
 
-.bottom .active {
-  color: #087f3f;
-  font-weight: bold;
+.search input{
+width:100%;
+padding:15px;
+border:1px solid #ddd;
+border-radius:12px;
+font-size:16px;
+outline:none;
 }
 
-</style>
-</head>
+.services{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px;
+padding:15px;
+}
 
-<body>
+.service{
+background:white;
+border:none;
+border-radius:16px;
+padding:22px 10px;
+font-size:17px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
 
-<!-- HEADER -->
+.service span{
+display:block;
+font-size:30px;
+margin-bottom:8px;
+}
 
-<div class="header">
+.bottom{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:65px;
+background:white;
+display:flex;
+justify-content:space-around;
+align-items:center;
+box-shadow:0 -2px 10px rgba(0,0,0,.1);
+z-index:1000;
+}
 
-  <h1>☪️ ইসলামী খিদমাহ</h1>
+.bottom button{
+border:none;
+background:none;
+font-size:14px;
+color:#555;
+}
 
-  <p>আপনার প্রয়োজন, আমাদের খিদমাহ</p>
-
-  <div id="welcome">
-    ব্যবহারকারী যাচাই হচ্ছে...
-  </div>
-
+.bottom .active{
+color:#087f3f;
+font-weight:bold;
+}
+</style></head><body><div class="header">
+<h1>☪️ ইসলামী খিদমাহ</h1>
+<p>আপনার প্রয়োজন, আমাদের খিদমাহ</p>
+<div id="welcome">ব্যবহারকারী যাচাই হচ্ছে...</div>
+</div><div class="location"><div class="location-title">
+📍 আপনার বর্তমান অবস্থান
+</div><div id="locationStatus">
+GPS অবস্থান নেওয়া হয়নি।
+</div><div id="placeName" class="place-name" style="display:none;"></div><button class="gps-btn" id="gpsBtn" type="button">
+📍 আমার বর্তমান অবস্থান নিন
+</button><div id="map"></div></div><div class="nearby-title">
+🛺 কাছাকাছি Online চালক
+</div><div id="driverList">
+<div class="driver-card">
+⏳ আগে আপনার বর্তমান অবস্থান নিন।
 </div>
+</div><div class="search"><input
+type="text"
+id="searchBox"
+placeholder="কী প্রয়োজন? লিখুন">
 
-
-<!-- LOCATION -->
-
-<div class="location">
-
-  <div class="location-title">
-    📍 আপনার বর্তমান অবস্থান
-  </div>
-
-  <div id="locationStatus">
-    GPS অবস্থান নেওয়া হয়নি।
-  </div>
-
-  <div
-    id="placeName"
-    class="place-name"
-    style="display:none;"
-  ></div>
-
-  <button
-    class="gps-btn"
-    id="gpsBtn"
-    type="button"
-  >
-    📍 আমার বর্তমান অবস্থান নিন
-  </button>
-
-  <!-- MAP -->
-
-  <div id="map"></div>
-
-</div>
-
-
-<!-- SEARCH -->
-
-<div class="search">
-
-  <input
-    type="text"
-    id="searchBox"
-    placeholder="কী প্রয়োজন? লিখুন"
-  >
-
-</div>
-
-
-<!-- SERVICES -->
-
-<div class="services">
-
-  <button
-    class="service"
-    onclick="serviceClick('বাজার')"
-  >
-    <span>🛒</span>
-    বাজার
-  </button>
-
-  <button
-    class="service"
-    onclick="serviceClick('রিকশা/অটো')"
-  >
-    <span>🛺</span>
-    রিকশা/অটো
-  </button>
-
-  <button
-    class="service"
-    onclick="serviceClick('খাবার')"
-  >
-    <span>🍱</span>
-    খাবার
-  </button>
-
-  <button
-    class="service"
-    onclick="serviceClick('ওষুধ')"
-  >
-    <span>💊</span>
-    ওষুধ
-  </button>
-
-  <button
-    class="service"
-    onclick="serviceClick('পার্সেল')"
-  >
-    <span>📦</span>
-    পার্সেল
-  </button>
-
-  <button
-    class="service"
-    onclick="serviceClick('কাজের লোক')"
-  >
-    <span>👷</span>
-    কাজের লোক
-  </button>
-
-  <button
-    class="service"
-    onclick="serviceClick('গাড়ি')"
-  >
-    <span>🚗</span>
-    গাড়ি
-  </button>
-
-  <button
-    class="service"
-    onclick="serviceClick('দোকান')"
-  >
-    <span>🏪</span>
-    দোকান
-  </button>
-
-</div>
-
-
-<!-- BOTTOM NAVIGATION -->
-
-<div class="bottom">
-
-  <button class="active">
-    🏠<br>
-    Home
-  </button>
-
-  <button onclick="orders()">
-    📋<br>
-    Orders
-  </button>
-
-  <button onclick="profile()">
-    👤<br>
-    আমি
-  </button>
-
-</div>
-
-
-<!-- LEAFLET -->
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-
-<!-- FIREBASE + GPS -->
-
-<script type="module">
+</div><div class="services"><button class="service" onclick="serviceClick('বাজার')">
+<span>🛒</span>
+বাজার
+</button><button class="service" onclick="serviceClick('রিকশা/অটো')">
+<span>🛺</span>
+রিকশা/অটো
+</button><button class="service" onclick="serviceClick('খাবার')">
+<span>🍱</span>
+খাবার
+</button><button class="service" onclick="serviceClick('ওষুধ')">
+<span>💊</span>
+ওষুধ
+</button><button class="service" onclick="serviceClick('পার্সেল')">
+<span>📦</span>
+পার্সেল
+</button><button class="service" onclick="serviceClick('কাজের লোক')">
+<span>👷</span>
+কাজের লোক
+</button><button class="service" onclick="serviceClick('গাড়ি')">
+<span>🚗</span>
+গাড়ি
+</button><button class="service" onclick="serviceClick('দোকান')">
+<span>🏪</span>
+দোকান
+</button></div><div class="bottom"><button class="active">
+🏠<br>
+Home
+</button><button onclick="orders()">
+📋<br>
+Orders
+</button><button onclick="profile()">
+👤<br>
+আমি
+</button></div><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script type="module">
 
 import { auth } from "./firebase.js";
 
 import {
-  onAuthStateChanged
+onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
+import {
+getFirestore,
+collection,
+query,
+where,
+getDocs
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-/* =========================
-   ELEMENTS
-========================= */
+const db=getFirestore();
 
-const welcome =
-  document.getElementById("welcome");
+const welcome=document.getElementById("welcome");
+const locationStatus=document.getElementById("locationStatus");
+const placeName=document.getElementById("placeName");
+const gpsBtn=document.getElementById("gpsBtn");
+const driverList=document.getElementById("driverList");
 
-const locationStatus =
-  document.getElementById("locationStatus");
+let currentUser=null;
+let userLatitude=null;
+let userLongitude=null;
+let userMarker=null;
+let driverMarkers=[];
 
-const placeName =
-  document.getElementById("placeName");
-
-const gpsBtn =
-  document.getElementById("gpsBtn");
-
-
-/* =========================
-   MAP
-========================= */
-
-let map = L.map("map").setView(
-  [25.7439, 89.2752],
-  7
+let map=L.map("map").setView(
+[25.7439,89.2752],
+7
 );
 
-
-/* OpenStreetMap */
-
 L.tileLayer(
-  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    maxZoom: 19,
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
-  }
+"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+{
+maxZoom:19,
+attribution:"&copy; OpenStreetMap contributors"
+}
 ).addTo(map);
 
+onAuthStateChanged(auth,(user)=>{
 
-/* Marker variable */
+if(!user){
 
-let userMarker = null;
+window.location.href="./index.html";
+return;
 
+}
 
-/* =========================
-   FIREBASE USER CHECK
-========================= */
+currentUser=user;
 
-onAuthStateChanged(auth, (user) => {
-
-  if (!user) {
-
-    window.location.href = "./index.html";
-
-    return;
-  }
-
-
-  const savedPhone =
-    localStorage.getItem("khidma_phone");
-
-  const savedAddress =
-    localStorage.getItem("khidma_address");
-
-  const savedSelfie =
-    localStorage.getItem("khidma_selfie");
-
-
-  if (
-    !savedPhone ||
-    !savedAddress ||
-    !savedSelfie
-  ) {
-
-    window.location.href = "./profile.html";
-
-    return;
-  }
-
-
-  welcome.innerText =
-    "স্বাগতম, " +
-    (user.displayName || "ব্যবহারকারী");
+welcome.innerText=
+"স্বাগতম, "+
+(user.displayName||"ব্যবহারকারী");
 
 });
 
+function distanceKm(lat1,lon1,lat2,lon2){
 
-/* =========================
-   GPS BUTTON
-========================= */
+const R=6371;
 
-gpsBtn.addEventListener(
-  "click",
-  function () {
+const dLat=(lat2-lat1)*Math.PI/180;
+const dLon=(lon2-lon1)*Math.PI/180;
 
-    locationStatus.innerText =
-      "⏳ আপনার বর্তমান অবস্থান খোঁজা হচ্ছে...";
+const a=
+Math.sin(dLat/2)*Math.sin(dLat/2)+
+Math.cos(lat1*Math.PI/180)*
+Math.cos(lat2*Math.PI/180)*
+Math.sin(dLon/2)*Math.sin(dLon/2);
 
-
-    placeName.style.display =
-      "block";
-
-    placeName.innerText =
-      "⏳ অবস্থানের নাম খোঁজা হচ্ছে...";
-
-
-    gpsBtn.disabled = true;
-
-    gpsBtn.innerText =
-      "⏳ অবস্থান নেওয়া হচ্ছে...";
-
-
-    /* Browser GPS support */
-
-    if (!navigator.geolocation) {
-
-      locationStatus.innerText =
-        "❌ এই ব্রাউজারে GPS/Location সুবিধা নেই।";
-
-      gpsBtn.disabled = false;
-
-      gpsBtn.innerText =
-        "📍 আবার চেষ্টা করুন";
-
-      return;
-    }
-
-
-    /* GET CURRENT POSITION */
-
-    navigator.geolocation.getCurrentPosition(
-
-      async function (position) {
-
-        const latitude =
-          position.coords.latitude;
-
-        const longitude =
-          position.coords.longitude;
-
-        const accuracy =
-          Math.round(
-            position.coords.accuracy
-          );
-
-
-        /* Save GPS */
-
-        localStorage.setItem(
-          "khidma_latitude",
-          latitude
-        );
-
-        localStorage.setItem(
-          "khidma_longitude",
-          longitude
-        );
-
-        localStorage.setItem(
-          "khidma_gps_time",
-          new Date().toISOString()
-        );
-
-
-        /* =========================
-           MAP MOVE
-        ========================= */
-
-        map.setView(
-          [latitude, longitude],
-          17
-        );
-
-
-        /* Remove old marker */
-
-        if (userMarker) {
-
-          map.removeLayer(
-            userMarker
-          );
-
-        }
-
-
-        /* New marker */
-
-        userMarker =
-          L.marker(
-            [latitude, longitude]
-          ).addTo(map);
-
-
-        userMarker.bindPopup(
-          "<b>📍 আপনার অবস্থান</b><br>" +
-          "ইসলামী খিদমাহ"
-        ).openPopup();
-
-
-        /* =========================
-           GPS STATUS
-        ========================= */
-
-        locationStatus.innerHTML =
-          "✅ GPS অবস্থান পাওয়া গেছে।<br>" +
-          "🎯 Accuracy: প্রায় " +
-          accuracy +
-          " মিটার";
-
-
-        /* =========================
-           REVERSE GEOCODING
-        ========================= */
-
-        try {
-
-          const apiUrl =
-            "https://api.bigdatacloud.net/data/" +
-            "reverse-geocode-client" +
-            "?latitude=" +
-            encodeURIComponent(latitude) +
-            "&longitude=" +
-            encodeURIComponent(longitude) +
-            "&localityLanguage=bn";
-
-
-          const response =
-            await fetch(apiUrl);
-
-
-          if (!response.ok) {
-
-            throw new Error(
-              "স্থান নাম API কাজ করেনি"
-            );
-
-          }
-
-
-          const data =
-            await response.json();
-
-
-          const city =
-            data.city ||
-            data.locality ||
-            data.principalSubdivision ||
-            "";
-
-
-          const locality =
-            data.localityInfo &&
-            data.localityInfo.administrativeArea &&
-            data.localityInfo.administrativeArea.length > 0
-              ? data.localityInfo.administrativeArea[0].name
-              : "";
-
-
-          const country =
-            data.countryName ||
-            "বাংলাদেশ";
-
-
-          let finalPlace = "";
-
-
-          if (
-            city &&
-            country
-          ) {
-
-            finalPlace =
-              city +
-              ", " +
-              country;
-
-          }
-
-          else if (city) {
-
-            finalPlace =
-              city;
-
-          }
-
-          else if (locality) {
-
-            finalPlace =
-              locality;
-
-          }
-
-          else if (
-            data.displayName
-          ) {
-
-            finalPlace =
-              data.displayName;
-
-          }
-
-
-          if (finalPlace) {
-
-            placeName.innerText =
-              "📍 " +
-              finalPlace;
-
-
-            localStorage.setItem(
-              "khidma_place_name",
-              finalPlace
-            );
-
-
-            /* Update popup */
-
-            if (userMarker) {
-
-              userMarker.bindPopup(
-                "<b>📍 আপনার অবস্থান</b><br>" +
-                finalPlace
-              ).openPopup();
-
-            }
-
-          }
-
-          else {
-
-            placeName.innerText =
-              "📍 GPS পাওয়া গেছে, কিন্তু এলাকার নাম পাওয়া যায়নি।";
-
-          }
-
-
-        }
-
-        catch (error) {
-
-          console.error(
-            "Place Name Error:",
-            error
-          );
-
-
-          placeName.innerText =
-            "⚠️ GPS ঠিক আছে, কিন্তু স্থানটির নাম এখন পাওয়া যায়নি।";
-
-        }
-
-
-        /* =========================
-           BUTTON RESET
-        ========================= */
-
-        gpsBtn.disabled = false;
-
-        gpsBtn.innerText =
-          "🔄 আবার অবস্থান নিন";
-
-      },
-
-
-      /* =========================
-         GPS ERROR
-      ========================= */
-
-      function (error) {
-
-        console.error(
-          "GPS Error:",
-          error
-        );
-
-
-        gpsBtn.disabled = false;
-
-        gpsBtn.innerText =
-          "📍 আবার GPS চেষ্টা করুন";
-
-
-        if (
-          error.code === 1
-        ) {
-
-          locationStatus.innerText =
-            "❌ Location Permission বন্ধ আছে। ফোনের Browser Settings থেকে Location Permission Allow করুন.";
-
-        }
-
-        else if (
-          error.code === 2
-        ) {
-
-          locationStatus.innerText =
-            "❌ আপনার অবস্থান পাওয়া যাচ্ছে না। ফোনের Location/GPS চালু করে আবার চেষ্টা করুন.";
-
-        }
-
-        else if (
-          error.code === 3
-        ) {
-
-          locationStatus.innerText =
-            "⏳ GPS-এর উত্তর পেতে বেশি সময় লাগছে। আবার চেষ্টা করুন.";
-
-        }
-
-        else {
-
-          locationStatus.innerText =
-            "❌ GPS অবস্থান নেওয়া যায়নি। আবার চেষ্টা করুন.";
-
-        }
-
-      },
-
-
-      /* GPS SETTINGS */
-
-      {
-        enableHighAccuracy: true,
-        timeout: 30000,
-        maximumAge: 0
-      }
-
-    );
-
-  }
+const c=2*Math.atan2(
+Math.sqrt(a),
+Math.sqrt(1-a)
 );
 
-
-/* =========================
-   LOAD SAVED LOCATION
-========================= */
-
-const savedLat =
-  localStorage.getItem(
-    "khidma_latitude"
-  );
-
-const savedLng =
-  localStorage.getItem(
-    "khidma_longitude"
-  );
-
-
-if (
-  savedLat &&
-  savedLng
-) {
-
-  const lat =
-    Number(savedLat);
-
-  const lng =
-    Number(savedLng);
-
-
-  map.setView(
-    [lat, lng],
-    17
-  );
-
-
-  userMarker =
-    L.marker(
-      [lat, lng]
-    ).addTo(map);
-
-
-  userMarker.bindPopup(
-    "📍 আপনার সংরক্ষিত অবস্থান"
-  );
-
-
-  const savedPlace =
-    localStorage.getItem(
-      "khidma_place_name"
-    );
-
-
-  if (savedPlace) {
-
-    placeName.style.display =
-      "block";
-
-    placeName.innerText =
-      "📍 " +
-      savedPlace;
-
-  }
+return R*c;
 
 }
 
+async function findNearbyDrivers(){
 
-</script>
+if(
+userLatitude===null||
+userLongitude===null
+){
 
-
-<!-- NORMAL JAVASCRIPT -->
-
-<script>
-
-function serviceClick(service) {
-
-  alert(
-    service +
-    " সার্ভিস খুব শীঘ্রই চালু হবে।"
-  );
+return;
 
 }
 
+driverList.innerHTML=
+'<div class="driver-card">⏳ কাছাকাছি চালক খোঁজা হচ্ছে...</div>';
 
-function orders() {
+try{
 
-  alert(
-    "আপনার Orders এখানে দেখা যাবে।"
-  );
+const driversQuery=query(
+collection(db,"users"),
+where("driverOnline","==",true)
+);
+
+const snapshot=
+await getDocs(driversQuery);
+
+driverMarkers.forEach(
+marker=>map.removeLayer(marker)
+);
+
+driverMarkers=[];
+
+let drivers=[];
+
+snapshot.forEach((docSnap)=>{
+
+const data=docSnap.data();
+
+if(
+typeof data.latitude!=="number"||
+typeof data.longitude!=="number"
+){
+
+return;
 
 }
 
+const distance=
+distanceKm(
+userLatitude,
+userLongitude,
+data.latitude,
+data.longitude
+);
 
-function profile() {
+if(distance<=5){
 
-  window.location.href =
-    "./profile.html";
+drivers.push({
+
+id:docSnap.id,
+vehicleType:data.vehicleType||"যানবাহন",
+latitude:data.latitude,
+longitude:data.longitude,
+distance:distance
+
+});
 
 }
 
-</script>
+});
 
+drivers.sort(
+(a,b)=>a.distance-b.distance
+);
 
-</body>
-  </html>
+if(drivers.length===0){
+
+driverList.innerHTML=
+'<div class="driver-card">😔 ৫ কিলোমিটারের মধ্যে এখন কোনো Online চালক পাওয়া যায়নি।</div>';
+
+return;
+
+}
+
+driverList.innerHTML="";
+
+drivers.forEach((driver,index)=>{
+
+const card=
+document.createElement("div");
+
+card.className="driver-card";
+
+const distanceText=
+driver.distance<1
+?Math.round(driver.distance*1000)+" মিটার"
+:driver.distance.toFixed(1)+" কিমি";
+
+card.innerHTML=
+'<div class="driver-top">'+
+'<div class="driver-name">🛺 চালক '+
+(index+1)+
+'</div>'+
+'<div class="online-dot">🟢 Online</div>'+
+'</div>'+
+'<div class="driver-info">'+
+'🚕 যানবাহন: '+
+driver.vehicleType+
+'<br>'+
+'📍 দূরত্ব: '+
+'<span class="distance">'+
+distanceText+
+'</span>'+
+'</div>';
+
+driverList.appendChild(card);
+
+const marker=
+L.marker(
+[driver.latitude,driver.longitude]
+).addTo(map);
+
+marker.bindPopup(
+"<b>🛺 Online চালক</b><br>"+
+"যানবাহন: "+
+driver.vehicleType+
+"<br>দূরত্ব: "+
+distanceText
+);
+
+driverMarkers.push(marker);
+
+});
+
+}
+
+catch(error){
+
+console.error(error);
+
+driverList.innerHTML=
+'<div class="driver-card">⚠️ চালকের অবস্থান এখন দেখা যাচ্ছে না। Firebase Permission পরীক্ষা করতে হবে।</div>';
+
+}
+
+}
+
+gpsBtn.addEventListener(
+"click",
+function(){
+
+locationStatus.innerText=
+"⏳ আপনার বর্তমান অবস্থান খোঁজা হচ্ছে...";
+
+gpsBtn.disabled=true;
+
+gpsBtn.innerText=
+"⏳ অবস্থান নেওয়া হচ্ছে...";
+
+if(!navigator.geolocation){
+
+locationStatus.innerText=
+"❌ এই ব্রাউজারে GPS সুবিধা নেই।";
+
+gpsBtn.disabled=false;
+
+gpsBtn.innerText=
+"📍 আবার চেষ্টা করুন";
+
+return;
+
+}
+
+navigator.geolocation.getCurrentPosition(
+
+async function(position){
+
+userLatitude=
+position.coords.latitude;
+
+userLongitude=
+position.coords.longitude;
+
+const accuracy=
+Math.round(
+position.coords.accuracy
+);
+
+localStorage.setItem(
+"khidma_latitude",
+userLatitude
+);
+
+localStorage.setItem(
+"khidma_longitude",
+userLongitude
+);
+
+localStorage.setItem(
+"khidma_gps_time",
+new Date().toISOString()
+);
+
+map.setView(
+[userLatitude,userLongitude],
+16
+);
+
+if(userMarker){
+
+map.removeLayer(userMarker);
+
+}
+
+userMarker=
+L.marker(
+[userLatitude,userLongitude]
+).addTo(map);
+
+userMarker.bindPopup(
+"<b>📍 আপনার অবস্থান</b>"
+).openPopup();
+
+locationStatus.innerHTML=
+"✅ GPS অবস্থান পাওয়া গেছে।<br>"+
+"🎯 Accuracy: প্রায় "+
+accuracy+
+" মিটার";
+
+placeName.style.display="block";
+placeName.innerText=
+"📍 আপনার বর্তমান অবস্থান";
+
+gpsBtn.disabled=false;
+
+gpsBtn.innerText=
+"🔄 আবার অবস্থান নিন";
+
+findNearbyDrivers();
+
+try{
+
+const apiUrl=
+"https://api.bigdatacloud.net/data/"+
+"reverse-geocode-client"+
+"?latitude="+
+encodeURIComponent(userLatitude)+
+"&longitude="+
+encodeURIComponent(userLongitude)+
+"&localityLanguage=bn";
+
+const response=
+await fetch(apiUrl);
+
+if(response.ok){
+
+const data=
+await response.json();
+
+const city=
+data.city||
+data.locality||
+data.principalSubdivision||
+"";
+
+const country=
+data.countryName||
+"বাংলাদেশ";
+
+if(city){
+
+const finalPlace=
+city+", "+country;
+
+placeName.innerText=
+"📍 "+finalPlace;
+
+localStorage.setItem(
+"khidma_place_name",
+finalPlace
+);
+
+}
+
+}
+
+}
+
+catch(error){
+
+console.log(
+"Place name unavailable"
+);
+
+}
+
+},
+
+function(error){
+
+console.error(error);
+
+gpsBtn.disabled=false;
+
+gpsBtn.innerText=
+"📍 আবার GPS চেষ্টা করুন";
+
+if(error.code===1){
+
+locationStatus.innerText=
+"❌ Location Permission বন্ধ আছে। Browser Settings থেকে Location Allow করুন।";
+
+}
+
+else if(error.code===2){
+
+locationStatus.innerText=
+"❌ অবস্থান পাওয়া যাচ্ছে না। ফোনের GPS/Location চালু করুন।";
+
+}
+
+else if(error.code===3){
+
+locationStatus.innerText=
+"⏳ GPS-এর উত্তর পেতে বেশি সময় লাগছে। আবার চেষ্টা করুন।";
+
+}
+
+else{
+
+locationStatus.innerText=
+"❌ GPS অবস্থান নেওয়া যায়নি।";
+
+}
+
+},
+
+{
+enableHighAccuracy:true,
+timeout:30000,
+maximumAge:0
+}
+
+);
+
+});
+
+const savedLat=
+localStorage.getItem(
+"khidma_latitude"
+);
+
+const savedLng=
+localStorage.getItem(
+"khidma_longitude"
+);
+
+if(savedLat&&savedLng){
+
+userLatitude=Number(savedLat);
+userLongitude=Number(savedLng);
+
+map.setView(
+[userLatitude,userLongitude],
+16
+);
+
+userMarker=
+L.marker(
+[userLatitude,userLongitude]
+).addTo(map);
+
+userMarker.bindPopup(
+"📍 আপনার সংরক্ষিত অবস্থান"
+);
+
+const savedPlace=
+localStorage.getItem(
+"khidma_place_name"
+);
+
+if(savedPlace){
+
+placeName.style.display="block";
+
+placeName.innerText=
+"📍 "+savedPlace;
+
+}
+
+findNearbyDrivers();
+
+}
+
+</script><script>
+
+function serviceClick(service){
+
+alert(
+service+
+" সার্ভিস খুব শীঘ্রই চালু হবে।"
+);
+
+}
+
+function orders(){
+
+alert(
+"আপনার Orders এখানে দেখা যাবে।"
+);
+
+}
+
+function profile(){
+
+window.location.href=
+"./profile.html";
+
+}
+
+</script></body>
+                            </html>
