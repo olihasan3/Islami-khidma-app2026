@@ -1,754 +1,401 @@
-<!DOCTYPE html>
-<html lang="bn">
+<!DOCTYPE html><html lang="bn">
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
-
-<title>ইসলামী খিদমাহ - Driver</title>
-
-<link
-rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-
-<style>
-
-*{
-  box-sizing:border-box;
-}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ইসলামী খিদমাহ - Ride</title><style>
+*{box-sizing:border-box}
 
 body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f4f7f5;
-  color:#222;
-  padding-bottom:30px;
+margin:0;
+font-family:Arial,sans-serif;
+background:#f4f7f5;
+color:#222;
+padding-bottom:30px;
 }
 
 .header{
-  background:#087f3f;
-  color:white;
-  padding:22px 18px;
-  border-radius:0 0 22px 22px;
+background:#087f3f;
+color:white;
+padding:22px 18px;
+border-radius:0 0 22px 22px;
 }
 
 .header h1{
-  margin:0;
-  font-size:24px;
+margin:0;
+font-size:24px;
 }
 
 .header p{
-  margin:7px 0 0;
-  font-size:14px;
+margin:7px 0 0;
+font-size:14px;
 }
 
 .container{
-  padding:15px;
+padding:15px;
 }
 
 .card{
-  background:white;
-  padding:18px;
-  border-radius:16px;
-  margin-bottom:15px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.user{
-  text-align:center;
-}
-
-.user img{
-  width:75px;
-  height:75px;
-  border-radius:50%;
-  object-fit:cover;
-}
-
-.user-name{
-  margin-top:8px;
-  font-size:18px;
-  font-weight:bold;
+background:white;
+padding:18px;
+border-radius:16px;
+margin-bottom:15px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
 label{
-  display:block;
-  margin-top:14px;
-  font-weight:bold;
+display:block;
+font-weight:bold;
+margin-top:14px;
 }
 
-select{
-  width:100%;
-  padding:14px;
-  margin-top:8px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  font-size:16px;
-}
-
-.status{
-  text-align:center;
-  padding:14px;
-  border-radius:10px;
-  background:#f1f1f1;
-  font-weight:bold;
-  margin-top:15px;
-}
-
-.online{
-  background:#e7f7ed;
-  color:#087f3f;
-}
-
-.offline{
-  background:#f5eeee;
-  color:#b00020;
+input,select{
+width:100%;
+padding:14px;
+margin-top:8px;
+border:1px solid #ddd;
+border-radius:10px;
+font-size:16px;
 }
 
 button{
-  width:100%;
-  padding:14px;
-  margin-top:12px;
-  border:0;
-  border-radius:10px;
-  background:#087f3f;
-  color:white;
-  font-size:16px;
-  font-weight:bold;
+width:100%;
+padding:14px;
+margin-top:15px;
+border:0;
+border-radius:10px;
+background:#087f3f;
+color:white;
+font-size:16px;
+font-weight:bold;
 }
 
 button:disabled{
-  opacity:.5;
+opacity:.5;
 }
 
-#map{
-  width:100%;
-  height:350px;
-  border-radius:14px;
-  overflow:hidden;
-  margin-top:12px;
+.status{
+margin-top:15px;
+padding:14px;
+border-radius:10px;
+background:#f1f1f1;
+text-align:center;
+font-weight:bold;
+line-height:1.6;
 }
 
-.info{
-  margin-top:12px;
-  padding:12px;
-  background:#f4f7f5;
-  border-radius:10px;
-  line-height:1.7;
-  font-size:14px;
+.success{
+background:#e7f7ed;
+color:#087f3f;
 }
 
-#message{
-  text-align:center;
-  margin-top:12px;
-  font-weight:bold;
-  line-height:1.6;
+.error{
+background:#fbeaea;
+color:#b00020;
 }
 
-</style>
+.request-box{
+display:none;
+margin-top:15px;
+padding:15px;
+background:#f4f7f5;
+border-radius:12px;
+line-height:1.8;
+}
 
-</head>
-
-<body>
-
-
-<div class="header">
-
+.back{
+background:#555;
+}
+</style></head><body><div class="header">
 <h1>☪️ ইসলামী খিদমাহ</h1>
-
-<p>চালক সেবা</p>
-
-</div>
-
-
-<div class="container">
-
-
-<!-- USER -->
-
-<div class="card user">
-
-<img
-id="userPhoto"
-src=""
-alt="Driver">
-
-<div
-id="userName"
-class="user-name">
-
-চালক যাচাই হচ্ছে...
-
-</div>
-
-</div>
-
-
-<!-- VEHICLE -->
-
-<div class="card">
+<p>রিকশা / অটো / ইজিবাইক Ride</p>
+</div><div class="container"><div class="card"><h3>🛺 Ride Request দিন</h3><label>
+📍 কোথা থেকে যাবেন?
+</label><input
+id="pickup"
+type="text"
+placeholder="যেমন: জয়পুরহাট রেলস্টেশন">
 
 <label>
-🛺 আপনার যানবাহন
-</label>
+📍 কোথায় যাবেন?
+</label><input
+id="destination"
+type="text"
+placeholder="যেমন: জয়পুরহাট বাজার">
 
-<select id="vehicleType">
+<label>
+👥 যাত্রী সংখ্যা
+</label><select id="passengers"><option value="1">১ জন</option>
+<option value="2">২ জন</option>
+<option value="3">৩ জন</option>
+<option value="4">৪ জন</option>
+<option value="5">৫ জন</option>
+<option value="6">৬ জন</option></select><label>
+💰 আপনার প্রস্তাবিত ভাড়া
+</label><input
+id="fare"
+type="number"
+min="1"
+placeholder="যেমন: 50">
 
-<option value="">
-যানবাহন নির্বাচন করুন
-</option>
+<button id="sendBtn">
+🛺 কাছের চালকদের কাছে Request পাঠান
+</button><div id="status" class="status">
+Ride Request এখনো পাঠানো হয়নি।
+</div><div id="requestBox" class="request-box"><b>🟢 Request পাঠানো হয়েছে</b>
 
-<option value="রিকশা">
-রিকশা
-</option>
+<br>📍 উঠার স্থান:
+<span id="showPickup"></span>
 
-<option value="অটো">
-অটো
-</option>
+<br>📍 গন্তব্য:
+<span id="showDestination"></span>
 
-<option value="ইজিবাইক">
-ইজিবাইক
-</option>
+<br>👥 যাত্রী:
+<span id="showPassengers"></span>
 
-</select>
+<br>💰 প্রস্তাবিত ভাড়া:
+<span id="showFare"></span> টাকা
 
+<br><br>
 
-<div
-id="status"
-class="status offline">
+⏳ কাছের Online চালকদের উত্তর অপেক্ষা করা হচ্ছে...
 
-🔴 Offline
-
-</div>
-
-
-<button
-id="onlineBtn"
-disabled>
-
-🟢 Online হন
-
+</div><button
+class="back"
+onclick="window.location.href='./home.html'">
+⬅️ Home-এ ফিরে যান
 </button>
 
-
-<button
-id="offlineBtn"
-disabled
-style="display:none;">
-
-🔴 Offline হন
-
-</button>
-
-
-<div
-id="message">
-</div>
-
-</div>
-
-
-<!-- MAP -->
-
-<div class="card">
-
-<b>
-📍 আপনার বর্তমান অবস্থান
-</b>
-
-<div id="map"></div>
-
-<div
-id="locationInfo"
-class="info">
-
-GPS চালু করা হয়নি।
-
-</div>
-
-</div>
-
-
-</div>
-
-
-<script
-src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-</script>
-
-
-<script type="module">
-
-
-/* =========================
-   FIREBASE
-========================= */
+</div></div><script type="module">
 
 import { auth } from "./firebase.js";
 
 import {
-  onAuthStateChanged
+onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 import {
-  getFirestore,
-  doc,
-  setDoc
+getFirestore,
+collection,
+addDoc,
+serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
+const db=getFirestore();
 
-const db =
-  getFirestore();
+const pickup=
+document.getElementById("pickup");
 
+const destination=
+document.getElementById("destination");
 
-/* =========================
-   ELEMENTS
-========================= */
+const passengers=
+document.getElementById("passengers");
 
-const userName =
-  document.getElementById("userName");
+const fare=
+document.getElementById("fare");
 
-const userPhoto =
-  document.getElementById("userPhoto");
+const sendBtn=
+document.getElementById("sendBtn");
 
-const vehicleType =
-  document.getElementById("vehicleType");
+const status=
+document.getElementById("status");
 
-const status =
-  document.getElementById("status");
+const requestBox=
+document.getElementById("requestBox");
 
-const onlineBtn =
-  document.getElementById("onlineBtn");
+const showPickup=
+document.getElementById("showPickup");
 
-const offlineBtn =
-  document.getElementById("offlineBtn");
+const showDestination=
+document.getElementById("showDestination");
 
-const locationInfo =
-  document.getElementById("locationInfo");
+const showPassengers=
+document.getElementById("showPassengers");
 
-const message =
-  document.getElementById("message");
+const showFare=
+document.getElementById("showFare");
 
+let currentUser=null;
 
-let currentUser = null;
+onAuthStateChanged(auth,(user)=>{
 
-let watchId = null;
+if(!user){
 
-let driverOnline = false;
+window.location.href="./index.html";
 
-let driverMarker = null;
+return;
 
+}
 
-/* =========================
-   MAP
-========================= */
+currentUser=user;
 
-const map =
-  L.map("map").setView(
-    [25.7439,89.2752],
-    7
-  );
+});
 
+sendBtn.addEventListener(
+"click",
+async()=>{
 
-L.tileLayer(
-  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    maxZoom:19,
+if(!currentUser){
 
-    attribution:
-      '&copy; OpenStreetMap contributors'
-  }
-).addTo(map);
+status.className="status error";
 
+status.innerText=
+"❌ আগে Google Login করুন।";
 
-/* =========================
-   LOGIN
-========================= */
+return;
 
-onAuthStateChanged(
-  auth,
-  (user)=>{
+}
 
-    if(!user){
+const pickupText=
+pickup.value.trim();
 
-      window.location.href =
-        "./index.html";
+const destinationText=
+destination.value.trim();
 
-      return;
-    }
+const passengerCount=
+Number(passengers.value);
 
+const fareAmount=
+Number(fare.value);
 
-    currentUser =
-      user;
+if(!pickupText){
 
+status.className="status error";
 
-    userName.innerText =
-      user.displayName ||
-      "চালক";
+status.innerText=
+"❌ কোথা থেকে যাবেন লিখুন।";
 
+pickup.focus();
 
-    if(user.photoURL){
+return;
 
-      userPhoto.src =
-        user.photoURL;
+}
 
-    }
+if(!destinationText){
 
+status.className="status error";
 
-    onlineBtn.disabled =
-      false;
+status.innerText=
+"❌ কোথায় যাবেন লিখুন।";
 
-  }
+destination.focus();
+
+return;
+
+}
+
+if(!fareAmount || fareAmount<=0){
+
+status.className="status error";
+
+status.innerText=
+"❌ প্রস্তাবিত ভাড়া লিখুন।";
+
+fare.focus();
+
+return;
+
+}
+
+sendBtn.disabled=true;
+
+sendBtn.innerText=
+"⏳ Request পাঠানো হচ্ছে...";
+
+status.className="status";
+
+status.innerText=
+"⏳ কাছের চালকদের কাছে Request পাঠানো হচ্ছে...";
+
+try{
+
+const requestRef=
+await addDoc(
+collection(db,"rideRequests"),
+{
+
+customerId:
+currentUser.uid,
+
+customerName:
+currentUser.displayName||"Customer",
+
+pickup:
+pickupText,
+
+destination:
+destinationText,
+
+passengers:
+passengerCount,
+
+offeredFare:
+fareAmount,
+
+finalFare:
+null,
+
+status:
+"waiting",
+
+acceptedDriverId:
+null,
+
+createdAt:
+serverTimestamp()
+
+}
 );
 
-
-/* =========================
-   VEHICLE CHECK
-========================= */
-
-vehicleType.addEventListener(
-  "change",
-  ()=>{
-    if(vehicleType.value){
-
-      onlineBtn.disabled =
-        false;
-
-    }else{
-
-      onlineBtn.disabled =
-        true;
-
-    }
-  }
+localStorage.setItem(
+"khidma_ride_request_id",
+requestRef.id
 );
 
+showPickup.innerText=
+pickupText;
 
-/* =========================
-   ONLINE
-========================= */
+showDestination.innerText=
+destinationText;
 
-onlineBtn.addEventListener(
-  "click",
-  ()=>{
+showPassengers.innerText=
+passengerCount+" জন";
 
-    if(!currentUser){
+showFare.innerText=
+fareAmount;
 
-      message.innerText =
-        "❌ চালক লগইন করা নেই।";
+requestBox.style.display=
+"block";
 
-      return;
-    }
+status.className=
+"status success";
 
+status.innerText=
+"🟢 Ride Request সফলভাবে পাঠানো হয়েছে।";
 
-    if(!vehicleType.value){
+sendBtn.innerText=
+"✅ Request পাঠানো হয়েছে";
 
-      message.innerText =
-        "❌ আগে যানবাহন নির্বাচন করুন।";
+}
 
-      return;
-    }
+catch(error){
 
+console.error(error);
 
-    if(!navigator.geolocation){
+status.className=
+"status error";
 
-      message.innerText =
-        "❌ এই ফোনে GPS নেই।";
+status.innerText=
+"❌ Request পাঠানো যায়নি। Firebase Permission পরীক্ষা করুন।";
 
-      return;
-    }
+sendBtn.disabled=false;
 
+sendBtn.innerText=
+"🛺 আবার Request পাঠান";
 
-    driverOnline =
-      true;
+}
 
+});
 
-    status.className =
-      "status online";
-
-    status.innerText =
-      "🟢 Online — যাত্রী খোঁজা হচ্ছে";
-
-
-    onlineBtn.style.display =
-      "none";
-
-    offlineBtn.style.display =
-      "block";
-
-
-    message.innerText =
-      "⏳ GPS চালু হচ্ছে...";
-
-
-    /* =========================
-       GPS WATCH
-    ========================= */
-
-    watchId =
-      navigator.geolocation.watchPosition(
-
-        async(position)=>{
-
-          const latitude =
-            position.coords.latitude;
-
-          const longitude =
-            position.coords.longitude;
-
-          const accuracy =
-            Math.round(
-              position.coords.accuracy
-            );
-
-
-          /* =========================
-             MAP
-          ========================= */
-
-          map.setView(
-            [latitude,longitude],
-            17
-          );
-
-
-          if(driverMarker){
-
-            driverMarker.setLatLng(
-              [latitude,longitude]
-            );
-
-          }else{
-
-            driverMarker =
-              L.marker(
-                [latitude,longitude]
-              ).addTo(map);
-
-          }
-
-
-          driverMarker.bindPopup(
-            "<b>🛺 আপনার অবস্থান</b><br>" +
-            vehicleType.value
-          );
-
-
-          /* =========================
-             LOCATION INFO
-          ========================= */
-
-          locationInfo.innerHTML =
-            "🟢 Live GPS চালু আছে<br>" +
-            "🚕 যানবাহন: " +
-            vehicleType.value +
-            "<br>" +
-            "🎯 Accuracy: প্রায় " +
-            accuracy +
-            " মিটার";
-
-
-          message.innerText =
-            "🟢 আপনার Live Location চালু আছে";
-
-
-          /* =========================
-             FIRESTORE
-          ========================= */
-
-          try{
-
-            await setDoc(
-
-              doc(
-                db,
-                "users",
-                currentUser.uid
-              ),
-
-              {
-
-                role:
-                  "driver",
-
-                vehicleType:
-                  vehicleType.value,
-
-                driverOnline:
-                  true,
-
-                latitude:
-                  latitude,
-
-                longitude:
-                  longitude,
-
-                gpsAccuracy:
-                  accuracy,
-
-                gpsUpdatedAt:
-                  new Date()
-
-              },
-
-              {
-                merge:true
-              }
-
-            );
-
-          }
-
-          catch(error){
-
-            console.error(
-              "Firebase Location Error:",
-              error
-            );
-
-            message.innerText =
-              "⚠️ GPS চলছে, কিন্তু Firebase-এ Location Save হয়নি।";
-
-          }
-
-        },
-
-
-        (error)=>{
-
-          console.error(
-            "GPS Error:",
-            error
-          );
-
-
-          message.innerText =
-            "❌ GPS Location পাওয়া যায়নি।";
-
-        },
-
-
-        {
-
-          enableHighAccuracy:true,
-
-          maximumAge:5000,
-
-          timeout:15000
-
-        }
-
-      );
-
-  }
-);
-
-
-/* =========================
-   OFFLINE
-========================= */
-
-offlineBtn.addEventListener(
-  "click",
-  async()=>{
-
-    driverOnline =
-      false;
-
-
-    /* Stop GPS */
-
-    if(watchId !== null){
-
-      navigator.geolocation.clearWatch(
-        watchId
-      );
-
-      watchId =
-        null;
-
-    }
-
-
-    status.className =
-      "status offline";
-
-    status.innerText =
-      "🔴 Offline";
-
-
-    onlineBtn.style.display =
-      "block";
-
-    offlineBtn.style.display =
-      "none";
-
-
-    locationInfo.innerText =
-      "GPS বন্ধ করা হয়েছে।";
-
-
-    message.innerText =
-      "⏳ Offline করা হচ্ছে...";
-
-
-    /* Firebase */
-
-    if(currentUser){
-
-      try{
-
-        await setDoc(
-
-          doc(
-            db,
-            "users",
-            currentUser.uid
-          ),
-
-          {
-
-            driverOnline:
-              false,
-
-            gpsUpdatedAt:
-              new Date()
-
-          },
-
-          {
-            merge:true
-          }
-
-        );
-
-
-        message.innerText =
-          "🔴 আপনি এখন Offline।";
-
-      }
-
-      catch(error){
-
-        console.error(
-          error
-        );
-
-        message.innerText =
-          "⚠️ Offline হয়েছে, কিন্তু Firebase Update হয়নি।";
-
-      }
-
-    }
-
-  }
-);
-
-
-</script>
-
-</body>
-</html>
+</script></body>
+      </html>
