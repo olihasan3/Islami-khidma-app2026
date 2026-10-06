@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ইসলামী খিদমাহ - Home</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7f5;
+      color: #222;
+      padding-bottom: 75px;
+    }
+
+    .header {
+      background: #087f3f;
+      color: white;
+      padding: 22px 18px;
+      border-radius: 0 0 22px 22px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 25px;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      font-size: 14px;
+    }
+
+    .location {
+      background: white;
+      margin: 15px;
+      padding: 14px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .search {
+      margin: 15px;
+    }
+
+    .search input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 15px;
+    }
+
+    .service {
+      background: white;
+      border: none;
+      border-radius: 16px;
+      padding: 22px 10px;
+      font-size: 17px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
+
+    .service span {
+      display: block;
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .service:active {
+      transform: scale(0.97);
+    }
+
+    .bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+
+    .bottom button {
+      border: none;
+      background: none;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .bottom .active {
+      color: #087f3f;
+      font-weight: bold;
+    }
+
+    #welcome {
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h1>☪️ ইসলামী খিদমাহ</h1>
+    <p>আপনার প্রয়োজন, আমাদের খিদমাহ</p>
+    <div id="welcome"></div>
+  </div>
+
+  <div class="location">
+    📍 আপনার অবস্থান
+    <br>
+    <small>লোকেশন নির্বাচন করুন</small>
+  </div>
+
+  <div class="search">
+    <input
+      type="text"
+      placeholder="কী প্রয়োজন? লিখুন"
+      id="searchBox"
+    >
+  </div>
+
+  <div class="services">
+
+    <button class="service" onclick="serviceClick('বাজার')">
+      <span>🛒</span>
+      বাজার
+    </button>
+
+    <button class="service" onclick="serviceClick('রিকশা/অটো')">
+      <span>🛺</span>
+      রিকশা/অটো
+    </button>
+
+    <button class="service" onclick="serviceClick('খাবার')">
+      <span>🍱</span>
+      খাবার
+    </button>
+
+    <button class="service" onclick="serviceClick('ওষুধ')">
+      <span>💊</span>
+      ওষুধ
+    </button>
+
+    <button class="service" onclick="serviceClick('পার্সেল')">
+      <span>📦</span>
+      পার্সেল
+    </button>
+
+    <button class="service" onclick="serviceClick('কাজের লোক')">
+      <span>👷</span>
+      কাজের লোক
+    </button>
+
+    <button class="service" onclick="serviceClick('গাড়ি')">
+      <span>🚗</span>
+      গাড়ি
+    </button>
+
+    <button class="service" onclick="serviceClick('দোকান')">
+      <span>🏪</span>
+      দোকান
+    </button>
+
+  </div>
+
+  <div class="bottom">
+
+    <button class="active">
+      🏠<br>
+      Home
+    </button>
+
+    <button onclick="orders()">
+      📋<br>
+      Orders
+    </button>
+
+    <button onclick="profile()">
+      👤<br>
+      আমি
+    </button>
+
+  </div>
+
+
+  <script type="module">
+
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+    import {
+      getAuth,
+      onAuthStateChanged
+    }
+      from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBa17W7lDjnB4V02sFiG_wJOQOtp3ZYpVU",
+      authDomain: "islami-khidma-app2026.firebaseapp.com",
+      projectId: "islami-khidma-app2026",
+      storageBucket: "islami-khidma-app2026.firebasestorage.app",
+      messagingSenderId: "552980551495",
+      appId: "1:552980551495:web:51787e78d534a60e7d9e62"
+    };
+
+
+    const app = initializeApp(firebaseConfig);
+
+    const auth = getAuth(app);
+
+
+    onAuthStateChanged(auth, (user) => {
+
+      if (user) {
+
+        document.getElementById("welcome").innerText =
+          "স্বাগতম, " + (user.displayName || "ব্যবহারকারী");
+
+      } else {
+
+        window.location.href = "index.html";
+
+      }
+
+    });
+
+
+  </script>
+
+
+  <script>
+
+    function serviceClick(service) {
+
+      alert(service + " সার্ভিস খুব শীঘ্রই চালু হবে।");
+
+    }
+
+
+    function orders() {
+
+      alert("আপনার Orders এখানে দেখা যাবে।");
+
+    }
+
+
+    function profile() {
+
+      alert("আপনার প্রোফাইল এখানে থাকবে।");
+
+    }
+
+  </script>
+
+</body>
+  </html>
