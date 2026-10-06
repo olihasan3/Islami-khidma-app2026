@@ -1,755 +1,141 @@
-<!DOCTYPE html><html lang="bn">
+<!DOCTYPE html>
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ইসলামী খিদমাহ - Home</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><style>
-*{box-sizing:border-box}
-
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#f4f7f5;
-color:#222;
-padding-bottom:75px;
-}
-
-.header{
-background:#087f3f;
-color:white;
-padding:22px 18px;
-border-radius:0 0 22px 22px;
-}
-
-.header h1{
-margin:0;
-font-size:25px;
-}
-
-.header p{
-margin:8px 0 0;
-font-size:14px;
-}
-
-#welcome{
-font-size:14px;
-margin-top:6px;
-}
-
-.location{
-background:white;
-margin:15px;
-padding:16px;
-border-radius:14px;
-box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.location-title{
-font-weight:bold;
-font-size:17px;
-}
-
-#locationStatus{
-margin-top:8px;
-color:#555;
-font-size:14px;
-line-height:1.6;
-}
-
-.place-name{
-margin-top:10px;
-padding:10px;
-background:#f1f8f4;
-border-radius:10px;
-color:#087f3f;
-font-size:17px;
-font-weight:bold;
-line-height:1.5;
-}
-
-.gps-btn{
-width:100%;
-margin-top:12px;
-padding:13px;
-border:none;
-border-radius:10px;
-background:#087f3f;
-color:white;
-font-size:16px;
-font-weight:bold;
-}
-
-.gps-btn:disabled{
-opacity:.6;
-}
-
-#map{
-width:100%;
-height:320px;
-margin-top:14px;
-border-radius:14px;
-overflow:hidden;
-border:1px solid #ddd;
-}
-
-.nearby-title{
-font-size:18px;
-font-weight:bold;
-margin:15px 15px 8px;
-}
-
-#driverList{
-margin:0 15px;
-}
-
-.driver-card{
-background:white;
-padding:15px;
-border-radius:14px;
-margin-bottom:10px;
-box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.driver-top{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-}
-
-.driver-name{
-font-size:17px;
-font-weight:bold;
-}
-
-.online-dot{
-color:#087f3f;
-font-weight:bold;
-}
-
-.driver-info{
-margin-top:8px;
-font-size:14px;
-line-height:1.7;
-color:#555;
-}
-
-.distance{
-color:#087f3f;
-font-weight:bold;
-}
-
-.search{
-margin:15px;
-}
-
-.search input{
-width:100%;
-padding:15px;
-border:1px solid #ddd;
-border-radius:12px;
-font-size:16px;
-outline:none;
-}
-
-.services{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:12px;
-padding:15px;
-}
-
-.service{
-background:white;
-border:none;
-border-radius:16px;
-padding:22px 10px;
-font-size:17px;
-box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.service span{
-display:block;
-font-size:30px;
-margin-bottom:8px;
-}
-
-.bottom{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-height:65px;
-background:white;
-display:flex;
-justify-content:space-around;
-align-items:center;
-box-shadow:0 -2px 10px rgba(0,0,0,.1);
-z-index:1000;
-}
-
-.bottom button{
-border:none;
-background:none;
-font-size:14px;
-color:#555;
-}
-
-.bottom .active{
-color:#087f3f;
-font-weight:bold;
-}
-</style></head><body><div class="header">
-<h1>☪️ ইসলামী খিদমাহ</h1>
-<p>আপনার প্রয়োজন, আমাদের খিদমাহ</p>
-<div id="welcome">ব্যবহারকারী যাচাই হচ্ছে...</div>
-</div><div class="location"><div class="location-title">
-📍 আপনার বর্তমান অবস্থান
-</div><div id="locationStatus">
-GPS অবস্থান নেওয়া হয়নি।
-</div><div id="placeName" class="place-name" style="display:none;"></div><button class="gps-btn" id="gpsBtn" type="button">
-📍 আমার বর্তমান অবস্থান নিন
-</button><div id="map"></div></div><div class="nearby-title">
-🛺 কাছাকাছি Online চালক
-</div><div id="driverList">
-<div class="driver-card">
-⏳ আগে আপনার বর্তমান অবস্থান নিন।
-</div>
-</div><div class="search"><input
-type="text"
-id="searchBox"
-placeholder="কী প্রয়োজন? লিখুন">
-
-</div><div class="services"><button class="service" onclick="serviceClick('বাজার')">
-<span>🛒</span>
-বাজার
-</button><button class="service" onclick="serviceClick('রিকশা/অটো')">
-<span>🛺</span>
-রিকশা/অটো
-</button><button class="service" onclick="serviceClick('খাবার')">
-<span>🍱</span>
-খাবার
-</button><button class="service" onclick="serviceClick('ওষুধ')">
-<span>💊</span>
-ওষুধ
-</button><button class="service" onclick="serviceClick('পার্সেল')">
-<span>📦</span>
-পার্সেল
-</button><button class="service" onclick="serviceClick('কাজের লোক')">
-<span>👷</span>
-কাজের লোক
-</button><button class="service" onclick="serviceClick('গাড়ি')">
-<span>🚗</span>
-গাড়ি
-</button><button class="service" onclick="serviceClick('দোকান')">
-<span>🏪</span>
-দোকান
-</button></div><div class="bottom"><button class="active">
-🏠<br>
-Home
-</button><button onclick="orders()">
-📋<br>
-Orders
-</button><button onclick="profile()">
-👤<br>
-আমি
-</button></div><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script type="module">
-
-import { auth } from "./firebase.js";
-
-import {
-onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-import {
-getFirestore,
-collection,
-query,
-where,
-getDocs
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
-const db=getFirestore();
-
-const welcome=document.getElementById("welcome");
-const locationStatus=document.getElementById("locationStatus");
-const placeName=document.getElementById("placeName");
-const gpsBtn=document.getElementById("gpsBtn");
-const driverList=document.getElementById("driverList");
-
-let currentUser=null;
-let userLatitude=null;
-let userLongitude=null;
-let userMarker=null;
-let driverMarkers=[];
-
-let map=L.map("map").setView(
-[25.7439,89.2752],
-7
-);
-
-L.tileLayer(
-"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-{
-maxZoom:19,
-attribution:"&copy; OpenStreetMap contributors"
-}
-).addTo(map);
-
-onAuthStateChanged(auth,(user)=>{
-
-if(!user){
-
-window.location.href="./index.html";
-return;
-
-}
-
-currentUser=user;
-
-welcome.innerText=
-"স্বাগতম, "+
-(user.displayName||"ব্যবহারকারী");
-
-});
-
-function distanceKm(lat1,lon1,lat2,lon2){
-
-const R=6371;
-
-const dLat=(lat2-lat1)*Math.PI/180;
-const dLon=(lon2-lon1)*Math.PI/180;
-
-const a=
-Math.sin(dLat/2)*Math.sin(dLat/2)+
-Math.cos(lat1*Math.PI/180)*
-Math.cos(lat2*Math.PI/180)*
-Math.sin(dLon/2)*Math.sin(dLon/2);
-
-const c=2*Math.atan2(
-Math.sqrt(a),
-Math.sqrt(1-a)
-);
-
-return R*c;
-
-}
-
-async function findNearbyDrivers(){
-
-if(
-userLatitude===null||
-userLongitude===null
-){
-
-return;
-
-}
-
-driverList.innerHTML=
-'<div class="driver-card">⏳ কাছাকাছি চালক খোঁজা হচ্ছে...</div>';
-
-try{
-
-const driversQuery=query(
-collection(db,"users"),
-where("driverOnline","==",true)
-);
-
-const snapshot=
-await getDocs(driversQuery);
-
-driverMarkers.forEach(
-marker=>map.removeLayer(marker)
-);
-
-driverMarkers=[];
-
-let drivers=[];
-
-snapshot.forEach((docSnap)=>{
-
-const data=docSnap.data();
-
-if(
-typeof data.latitude!=="number"||
-typeof data.longitude!=="number"
-){
-
-return;
-
-}
-
-const distance=
-distanceKm(
-userLatitude,
-userLongitude,
-data.latitude,
-data.longitude
-);
-
-if(distance<=5){
-
-drivers.push({
-
-id:docSnap.id,
-vehicleType:data.vehicleType||"যানবাহন",
-latitude:data.latitude,
-longitude:data.longitude,
-distance:distance
-
-});
-
-}
-
-});
-
-drivers.sort(
-(a,b)=>a.distance-b.distance
-);
-
-if(drivers.length===0){
-
-driverList.innerHTML=
-'<div class="driver-card">😔 ৫ কিলোমিটারের মধ্যে এখন কোনো Online চালক পাওয়া যায়নি।</div>';
-
-return;
-
-}
-
-driverList.innerHTML="";
-
-drivers.forEach((driver,index)=>{
-
-const card=
-document.createElement("div");
-
-card.className="driver-card";
-
-const distanceText=
-driver.distance<1
-?Math.round(driver.distance*1000)+" মিটার"
-:driver.distance.toFixed(1)+" কিমি";
-
-card.innerHTML=
-'<div class="driver-top">'+
-'<div class="driver-name">🛺 চালক '+
-(index+1)+
-'</div>'+
-'<div class="online-dot">🟢 Online</div>'+
-'</div>'+
-'<div class="driver-info">'+
-'🚕 যানবাহন: '+
-driver.vehicleType+
-'<br>'+
-'📍 দূরত্ব: '+
-'<span class="distance">'+
-distanceText+
-'</span>'+
-'</div>';
-
-driverList.appendChild(card);
-
-const marker=
-L.marker(
-[driver.latitude,driver.longitude]
-).addTo(map);
-
-marker.bindPopup(
-"<b>🛺 Online চালক</b><br>"+
-"যানবাহন: "+
-driver.vehicleType+
-"<br>দূরত্ব: "+
-distanceText
-);
-
-driverMarkers.push(marker);
-
-});
-
-}
-
-catch(error){
-
-console.error(error);
-
-driverList.innerHTML=
-'<div class="driver-card">⚠️ চালকের অবস্থান এখন দেখা যাচ্ছে না। Firebase Permission পরীক্ষা করতে হবে।</div>';
-
-}
-
-}
-
-gpsBtn.addEventListener(
-"click",
-function(){
-
-locationStatus.innerText=
-"⏳ আপনার বর্তমান অবস্থান খোঁজা হচ্ছে...";
-
-gpsBtn.disabled=true;
-
-gpsBtn.innerText=
-"⏳ অবস্থান নেওয়া হচ্ছে...";
-
-if(!navigator.geolocation){
-
-locationStatus.innerText=
-"❌ এই ব্রাউজারে GPS সুবিধা নেই।";
-
-gpsBtn.disabled=false;
-
-gpsBtn.innerText=
-"📍 আবার চেষ্টা করুন";
-
-return;
-
-}
-
-navigator.geolocation.getCurrentPosition(
-
-async function(position){
-
-userLatitude=
-position.coords.latitude;
-
-userLongitude=
-position.coords.longitude;
-
-const accuracy=
-Math.round(
-position.coords.accuracy
-);
-
-localStorage.setItem(
-"khidma_latitude",
-userLatitude
-);
-
-localStorage.setItem(
-"khidma_longitude",
-userLongitude
-);
-
-localStorage.setItem(
-"khidma_gps_time",
-new Date().toISOString()
-);
-
-map.setView(
-[userLatitude,userLongitude],
-16
-);
-
-if(userMarker){
-
-map.removeLayer(userMarker);
-
-}
-
-userMarker=
-L.marker(
-[userLatitude,userLongitude]
-).addTo(map);
-
-userMarker.bindPopup(
-"<b>📍 আপনার অবস্থান</b>"
-).openPopup();
-
-locationStatus.innerHTML=
-"✅ GPS অবস্থান পাওয়া গেছে।<br>"+
-"🎯 Accuracy: প্রায় "+
-accuracy+
-" মিটার";
-
-placeName.style.display="block";
-placeName.innerText=
-"📍 আপনার বর্তমান অবস্থান";
-
-gpsBtn.disabled=false;
-
-gpsBtn.innerText=
-"🔄 আবার অবস্থান নিন";
-
-findNearbyDrivers();
-
-try{
-
-const apiUrl=
-"https://api.bigdatacloud.net/data/"+
-"reverse-geocode-client"+
-"?latitude="+
-encodeURIComponent(userLatitude)+
-"&longitude="+
-encodeURIComponent(userLongitude)+
-"&localityLanguage=bn";
-
-const response=
-await fetch(apiUrl);
-
-if(response.ok){
-
-const data=
-await response.json();
-
-const city=
-data.city||
-data.locality||
-data.principalSubdivision||
-"";
-
-const country=
-data.countryName||
-"বাংলাদেশ";
-
-if(city){
-
-const finalPlace=
-city+", "+country;
-
-placeName.innerText=
-"📍 "+finalPlace;
-
-localStorage.setItem(
-"khidma_place_name",
-finalPlace
-);
-
-}
-
-}
-
-}
-
-catch(error){
-
-console.log(
-"Place name unavailable"
-);
-
-}
-
-},
-
-function(error){
-
-console.error(error);
-
-gpsBtn.disabled=false;
-
-gpsBtn.innerText=
-"📍 আবার GPS চেষ্টা করুন";
-
-if(error.code===1){
-
-locationStatus.innerText=
-"❌ Location Permission বন্ধ আছে। Browser Settings থেকে Location Allow করুন।";
-
-}
-
-else if(error.code===2){
-
-locationStatus.innerText=
-"❌ অবস্থান পাওয়া যাচ্ছে না। ফোনের GPS/Location চালু করুন।";
-
-}
-
-else if(error.code===3){
-
-locationStatus.innerText=
-"⏳ GPS-এর উত্তর পেতে বেশি সময় লাগছে। আবার চেষ্টা করুন।";
-
-}
-
-else{
-
-locationStatus.innerText=
-"❌ GPS অবস্থান নেওয়া যায়নি।";
-
-}
-
-},
-
-{
-enableHighAccuracy:true,
-timeout:30000,
-maximumAge:0
-}
-
-);
-
-});
-
-const savedLat=
-localStorage.getItem(
-"khidma_latitude"
-);
-
-const savedLng=
-localStorage.getItem(
-"khidma_longitude"
-);
-
-if(savedLat&&savedLng){
-
-userLatitude=Number(savedLat);
-userLongitude=Number(savedLng);
-
-map.setView(
-[userLatitude,userLongitude],
-16
-);
-
-userMarker=
-L.marker(
-[userLatitude,userLongitude]
-).addTo(map);
-
-userMarker.bindPopup(
-"📍 আপনার সংরক্ষিত অবস্থান"
-);
-
-const savedPlace=
-localStorage.getItem(
-"khidma_place_name"
-);
-
-if(savedPlace){
-
-placeName.style.display="block";
-
-placeName.innerText=
-"📍 "+savedPlace;
-
-}
-
-findNearbyDrivers();
-
-}
-
-</script><script>
-
-function serviceClick(service){
-
-alert(
-service+
-" সার্ভিস খুব শীঘ্রই চালু হবে।"
-);
-
-}
-
-function orders(){
-
-alert(
-"আপনার Orders এখানে দেখা যাবে।"
-);
-
-}
-
-function profile(){
-
-window.location.href=
-"./profile.html";
-
-}
-
-</script></body>
-                            </html>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ইসলামী খিদমাহ - Islami Khidma</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- ১. টপ হেডার (লোগো ও হেল্পলাইন) -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- লোগো -->
+            <div class="flex items-center space-x-2">
+                <img src="your-logo.png" alt="ইসলামী খিদমাহ" class="h-10 w-auto object-contain">
+                <div>
+                    <span class="font-bold text-emerald-800 text-base block leading-tight">ইসলামী খিদমাহ</span>
+                    <span class="text-[10px] text-gray-500">আপনার পাশে, সবসময়</span>
+                </div>
+            </div>
+            <!-- হেল্পলাইন বা হটলাইন বাটন -->
+            <a href="tel:09600000000" class="bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 shadow hover:bg-emerald-800 transition">
+                <span>📞</span>
+                <span>হেল্পলাইন</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- ২. সাব-হেডার মেনু বার (সবুজ রঙে) -->
+    <nav class="bg-emerald-800 text-white py-2 px-4 shadow-inner">
+        <div class="container mx-auto flex justify-between items-center text-sm">
+            <div class="flex items-center space-x-3">
+                <button class="text-xl">☰</button>
+                <span class="font-medium text-xs sm:text-sm">জয়পুরহাট সদর শাখা</span>
+            </div>
+            <div class="text-xs bg-emerald-900 px-2.5 py-1 rounded border border-emerald-700">
+                🟢 লাইভ
+            </div>
+        </div>
+    </nav>
+
+    <!-- মূল কন্টেন্ট এলাকা -->
+    <main class="container mx-auto px-4 py-4 max-w-md pb-24">
+
+        <!-- ৩. প্রমোশনাল ব্যানার (স্লাইডার স্টাইল) -->
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-4 rounded-xl shadow-md mb-5 relative overflow-hidden flex justify-between items-center">
+            <div>
+                <span class="bg-amber-400 text-emerald-950 text-[10px] font-bold px-2 py-0.5 rounded uppercase">বিশেষ সেবা</span>
+                <h2 class="text-lg font-bold mt-1">প্রযুক্তির উৎকর্ষে খিদমাহ নিমেষে</h2>
+                <p class="text-xs text-emerald-100 mt-1">ঘরে বসেই পান রিকশা, বাজার ও জরুরি সেবা।</p>
+            </div>
+            <div class="text-3xl opacity-80">🛺</div>
+        </div>
+
+        <!-- ৪. সার্চ বক্স -->
+        <div class="mb-5">
+            <div class="relative">
+                <input type="text" placeholder="কী প্রয়োজন? এখানে লিখুন (যেমন: বাজার, ওষুধ)..." class="w-full p-3.5 pl-11 bg-white rounded-xl shadow-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm">
+                <span class="absolute left-4 top-3.5 text-gray-400 text-lg">🔍</span>
+            </div>
+        </div>
+
+        <!-- ৫. প্রধান সেবাসমূহ (Grid Layout) -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-5">
+            <h3 class="text-sm font-bold mb-3 text-emerald-900 border-b pb-2">আমাদের সেবাসমূহ</h3>
+            
+            <div class="grid grid-cols-4 gap-3 text-center">
+                <a href="#" class="flex flex-col items-center p-2 rounded-lg hover:bg-emerald-50 transition">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🛒</div>
+                    <span class="text-[11px] font-semibold text-gray-700">বাজার</span>
+                </a>
+                <a href="#" class="flex flex-col items-center p-2 rounded-lg hover:bg-emerald-50 transition">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🛺</div>
+                    <span class="text-[11px] font-semibold text-gray-700">রিকশা/অটো</span>
+                </a>
+                <a href="#" class="flex flex-col items-center p-2 rounded-lg hover:bg-emerald-50 transition">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🍱</div>
+                    <span class="text-[11px] font-semibold text-gray-700">খাবার</span>
+                </a>
+                <a href="#" class="flex flex-col items-center p-2 rounded-lg hover:bg-emerald-50 transition">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">💊</div>
+                    <span class="text-[11px] font-semibold text-gray-700">ওষুধ</span>
+                </a>
+                <a href="#" class="flex flex-col items-center p-2 rounded-lg hover:bg-emerald-50 transition">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">📦</div>
+                    <span class="text-[11px] font-semibold text-gray-700">পার্সেল</span>
+                </a>
+                <a href="#" class="flex flex-col items-center p-2 rounded-lg hover:bg-emerald-50 transition">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">👷</div>
+                    <span class="text-[11px] font-semibold text-gray-700">কাজের লোক</span>
+                </a>
+                <a href="#" class="flex flex-col items-center p-2 rounded-lg hover:bg-emerald-50 transition">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🚗</div>
+                    <span class="text-[11px] font-semibold text-gray-700">গাড়ি</span>
+                </a>
+                <a href="#" class="flex flex-col items-center p-2 rounded-lg hover:bg-emerald-50 transition">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-1 border border-emerald-100">🏪</div>
+                    <span class="text-[11px] font-semibold text-gray-700">দোকান</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- ৬. এবাউট / পরিচিতি সেকশন (ব্যাংকের স্টাইলে) -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
+            <h4 class="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">About Us</h4>
+            <div class="w-16 h-16 mx-auto my-2 rounded-full border-2 border-amber-500 flex items-center justify-center bg-emerald-900 text-amber-400 font-bold text-xl shadow">
+                IK
+            </div>
+            <p class="text-xs text-gray-600 mt-2 leading-relaxed">
+                ইসলামী খিদমাহ একটি সামাজিক ও লোকাল সার্ভিস প্ল্যাটফর্ম। জয়পুরহাটের মানুষের দৈনন্দিন জীবনযাত্রাকে সহজ ও স্বাচ্ছন্দ্যময় করতে আমরা সর্বদা প্রতিশ্রুতিবদ্ধ।
+            </p>
+        </div>
+
+    </main>
+
+    <!-- ৭. ফিক্সড বটম নেভিগেশন বার -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2.5 shadow-lg max-w-md mx-auto z-50">
+        <div class="flex justify-around items-center text-gray-500">
+            <a href="#" class="flex flex-col items-center text-emerald-700">
+                <span class="text-lg">🏠</span>
+                <span class="text-[10px] font-bold">Home</span>
+            </a>
+            <a href="#" class="flex flex-col items-center hover:text-emerald-700">
+                <span class="text-lg">📦</span>
+                <span class="text-[10px]">Orders</span>
+            </a>
+            <a href="#" class="flex flex-col items-center hover:text-emerald-700">
+                <span class="text-lg">👤</span>
+                <span class="text-[10px]">আমি</span>
+            </a>
+        </div>
+    </nav>
+
+</body>
+  </html>
+              
