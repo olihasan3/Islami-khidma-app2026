@@ -2,6 +2,7 @@
 <html lang="bn">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -190,6 +191,7 @@
     <button
       class="gps-btn"
       id="gpsBtn"
+      type="button"
     >
       📍 আমার বর্তমান অবস্থান নিন
     </button>
@@ -214,15 +216,12 @@
 
   <div class="services">
 
-
     <button
       class="service"
       onclick="serviceClick('বাজার')"
     >
-
       <span>🛒</span>
       বাজার
-
     </button>
 
 
@@ -230,10 +229,8 @@
       class="service"
       onclick="serviceClick('রিকশা/অটো')"
     >
-
       <span>🛺</span>
       রিকশা/অটো
-
     </button>
 
 
@@ -241,10 +238,8 @@
       class="service"
       onclick="serviceClick('খাবার')"
     >
-
       <span>🍱</span>
       খাবার
-
     </button>
 
 
@@ -252,10 +247,8 @@
       class="service"
       onclick="serviceClick('ওষুধ')"
     >
-
       <span>💊</span>
       ওষুধ
-
     </button>
 
 
@@ -263,10 +256,8 @@
       class="service"
       onclick="serviceClick('পার্সেল')"
     >
-
       <span>📦</span>
       পার্সেল
-
     </button>
 
 
@@ -274,10 +265,8 @@
       class="service"
       onclick="serviceClick('কাজের লোক')"
     >
-
       <span>👷</span>
       কাজের লোক
-
     </button>
 
 
@@ -285,10 +274,8 @@
       class="service"
       onclick="serviceClick('গাড়ি')"
     >
-
       <span>🚗</span>
       গাড়ি
-
     </button>
 
 
@@ -296,12 +283,9 @@
       class="service"
       onclick="serviceClick('দোকান')"
     >
-
       <span>🏪</span>
       দোকান
-
     </button>
-
 
   </div>
 
@@ -330,7 +314,7 @@
   </div>
 
 
-  <!-- Firebase + GPS -->
+  <!-- Firebase -->
 
   <script type="module">
 
@@ -423,33 +407,51 @@
 
     gpsBtn.addEventListener(
       "click",
-      () => {
+      function () {
+
+        /*
+          প্রথমেই বোঝানো হবে
+          যে বাটন কাজ করেছে
+        */
+
+        locationStatus.innerText =
+          "⏳ GPS চালু করার চেষ্টা হচ্ছে...";
+
+
+        gpsBtn.disabled = true;
+
+        gpsBtn.innerText =
+          "⏳ অবস্থান নেওয়া হচ্ছে...";
+
+
+        /*
+          Browser GPS আছে কিনা
+        */
 
         if (
           !navigator.geolocation
         ) {
 
           locationStatus.innerText =
-            "❌ আপনার ফোনে GPS/Geolocation সাপোর্ট নেই।";
+            "❌ এই ব্রাউজারে GPS/Location সুবিধা পাওয়া যাচ্ছে না।";
+
+          gpsBtn.disabled = false;
+
+          gpsBtn.innerText =
+            "📍 আবার চেষ্টা করুন";
 
           return;
 
         }
 
 
-        gpsBtn.disabled = true;
-
-        gpsBtn.innerText =
-          "⏳ GPS অবস্থান নেওয়া হচ্ছে...";
-
-
-        locationStatus.innerText =
-          "📍 আপনার অবস্থান খোঁজা হচ্ছে...";
-
+        /*
+          GPS Location নেওয়া
+        */
 
         navigator.geolocation.getCurrentPosition(
 
-          (position) => {
+          function (position) {
 
             const latitude =
               position.coords.latitude;
@@ -464,8 +466,7 @@
 
 
             /*
-              ফোনে সাময়িকভাবে
-              GPS তথ্য রাখা
+              LocalStorage-এ GPS রাখা
             */
 
             localStorage.setItem(
@@ -478,23 +479,26 @@
               longitude
             );
 
-
             localStorage.setItem(
               "khidma_gps_time",
               new Date().toISOString()
             );
 
 
+            /*
+              Screen-এ GPS দেখানো
+            */
+
             locationStatus.innerHTML =
-              "✅ আপনার GPS অবস্থান পাওয়া গেছে।" +
+              "✅ আপনার অবস্থান পাওয়া গেছে!" +
               "<br><br>" +
-              "Latitude: " +
+              "📍 Latitude: " +
               latitude.toFixed(6) +
               "<br>" +
-              "Longitude: " +
+              "📍 Longitude: " +
               longitude.toFixed(6) +
               "<br>" +
-              "Accuracy: প্রায় " +
+              "🎯 Accuracy: প্রায় " +
               accuracy +
               " মিটার";
 
@@ -507,11 +511,16 @@
           },
 
 
-          (error) => {
+          function (error) {
 
-            console.error(
+            console.log(
+              "GPS Error Code:",
+              error.code
+            );
+
+            console.log(
               "GPS Error:",
-              error
+              error.message
             );
 
 
@@ -521,37 +530,64 @@
               "📍 আবার GPS চেষ্টা করুন";
 
 
+            /*
+              Permission সমস্যা
+            */
+
             if (
               error.code === 1
             ) {
 
-              locationStatus.innerText =
-                "❌ Location Permission বন্ধ আছে। ফোনের Settings থেকে Location Permission চালু করুন।";
+              locationStatus.innerHTML =
+                "❌ Location Permission বন্ধ আছে।" +
+                "<br><br>" +
+                "ফোনের Browser Settings থেকে Location Permission Allow করুন।";
 
             }
+
+
+            /*
+              Position পাওয়া যাচ্ছে না
+            */
 
             else if (
               error.code === 2
             ) {
 
-              locationStatus.innerText =
-                "❌ আপনার অবস্থান পাওয়া যাচ্ছে না। GPS/Location চালু করে আবার চেষ্টা করুন।";
+              locationStatus.innerHTML =
+                "❌ আপনার অবস্থান পাওয়া যাচ্ছে না।" +
+                "<br><br>" +
+                "ফোনের Location/GPS চালু করে আবার চেষ্টা করুন।";
 
             }
+
+
+            /*
+              Timeout
+            */
 
             else if (
               error.code === 3
             ) {
 
-              locationStatus.innerText =
-                "⏳ GPS-এর সময় শেষ হয়ে গেছে। আবার চেষ্টা করুন।";
+              locationStatus.innerHTML =
+                "⏳ GPS-এর উত্তর পেতে বেশি সময় লাগছে।" +
+                "<br><br>" +
+                "Location চালু করে আবার চেষ্টা করুন।";
 
             }
 
+
+            /*
+              অন্য সমস্যা
+            */
+
             else {
 
-              locationStatus.innerText =
-                "❌ GPS অবস্থান নেওয়া যায়নি। আবার চেষ্টা করুন।";
+              locationStatus.innerHTML =
+                "❌ GPS অবস্থান নেওয়া যায়নি।" +
+                "<br><br>" +
+                "আবার চেষ্টা করুন।";
 
             }
 
@@ -560,7 +596,7 @@
 
           {
             enableHighAccuracy: true,
-            timeout: 15000,
+            timeout: 30000,
             maximumAge: 0
           }
 
@@ -570,8 +606,11 @@
 
     );
 
+
   </script>
 
+
+  <!-- Other Buttons -->
 
   <script>
 
@@ -606,4 +645,4 @@
 
 </body>
 
-      </html>
+  </html>
