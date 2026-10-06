@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>প্রোফাইল তৈরি - ইসলামী খিদমাহ</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f8f4;
+      color: #123d29;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: auto;
+      min-height: 100vh;
+      padding: 20px 18px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 10px 0 18px;
+    }
+
+    .header h1 {
+      color: #087f3f;
+      margin: 5px 0;
+    }
+
+    .card {
+      background: white;
+      padding: 22px 18px;
+      border-radius: 18px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .photo {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      display: block;
+      margin: 0 auto 10px;
+      object-fit: cover;
+      background: #087f3f;
+    }
+
+    .google-name {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .selfie-title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .camera-box {
+      width: 100%;
+      background: #111;
+      border-radius: 14px;
+      overflow: hidden;
+      display: none;
+    }
+
+    #camera {
+      width: 100%;
+      display: block;
+    }
+
+    #selfiePreview {
+      width: 100%;
+      border-radius: 14px;
+      display: none;
+    }
+
+    .camera-btn,
+    .retake-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .camera-btn {
+      background: #087f3f;
+      color: white;
+    }
+
+    .retake-btn {
+      background: #e9eeee;
+      color: #123d29;
+      display: none;
+    }
+
+    .selfie-status {
+      text-align: center;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .save-btn {
+      width: 100%;
+      margin-top: 25px;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #087f3f;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .save-btn:disabled {
+      opacity: 0.5;
+    }
+
+    #status {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .required {
+      color: #d00;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="header">
+      <h1>☪️ ইসলামী খিদমাহ</h1>
+      <p>প্রোফাইল তৈরি করুন</p>
+    </div>
+
+    <div class="card">
+
+      <img id="profilePhoto" class="photo" alt="Google Photo">
+
+      <div id="googleName" class="google-name">
+        প্রোফাইল লোড হচ্ছে...
+      </div>
+
+
+      <!-- Live Selfie -->
+
+      <div class="selfie-title">
+        📸 Live Selfie <span class="required">*</span>
+      </div>
+
+      <div class="selfie-status" id="selfieStatus">
+        নতুন Live Selfie তোলা বাধ্যতামূলক
+      </div>
+
+      <div class="camera-box" id="cameraBox">
+
+        <video
+          id="camera"
+          autoplay
+          playsinline
+        ></video>
+
+      </div>
+
+      <canvas id="canvas" style="display:none;"></canvas>
+
+      <img
+        id="selfiePreview"
+        alt="Live Selfie Preview"
+      >
+
+      <button
+        class="camera-btn"
+        id="cameraBtn"
+      >
+        📷 Live Selfie তুলুন
+      </button>
+
+      <button
+        class="retake-btn"
+        id="retakeBtn"
+      >
+        🔄 আবার Selfie তুলুন
+      </button>
+
+
+      <label for="phone">
+        📱 মোবাইল নম্বর <span class="required">*</span>
+      </label>
+
+      <input
+        type="tel"
+        id="phone"
+        placeholder="01XXXXXXXXX"
+        maxlength="11"
+      >
+
+
+      <label for="address">
+        📍 আপনার ঠিকানা <span class="required">*</span>
+      </label>
+
+      <textarea
+        id="address"
+        placeholder="আপনার ঠিকানা লিখুন"
+      ></textarea>
+
+
+      <button
+        class="save-btn"
+        id="saveProfile"
+        disabled
+      >
+        প্রোফাইল সংরক্ষণ করুন
+      </button>
+
+      <div id="status"></div>
+
+    </div>
+
+  </div>
+
+
+  <script type="module">
+
+    import { auth } from "./firebase.js";
+
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+    const profilePhoto =
+      document.getElementById("profilePhoto");
+
+    const googleName =
+      document.getElementById("googleName");
+
+    const camera =
+      document.getElementById("camera");
+
+    const cameraBox =
+      document.getElementById("cameraBox");
+
+    const canvas =
+      document.getElementById("canvas");
+
+    const selfiePreview =
+      document.getElementById("selfiePreview");
+
+    const cameraBtn =
+      document.getElementById("cameraBtn");
+
+    const retakeBtn =
+      document.getElementById("retakeBtn");
+
+    const selfieStatus =
+      document.getElementById("selfieStatus");
+
+    const phone =
+      document.getElementById("phone");
+
+    const address =
+      document.getElementById("address");
+
+    const saveProfile =
+      document.getElementById("saveProfile");
+
+    const status =
+      document.getElementById("status");
+
+
+    let currentUser = null;
+    let selfieTaken = false;
+    let cameraStream = null;
+
+
+    // Check Google Login
+
+    onAuthStateChanged(auth, (user) => {
+
+      if (!user) {
+
+        window.location.href = "./index.html";
+        return;
+
+      }
+
+      currentUser = user;
+
+      googleName.innerText =
+        user.displayName || "ব্যবহারকারী";
+
+
+      if (user.photoURL) {
+
+        profilePhoto.src = user.photoURL;
+
+      } else {
+
+        profilePhoto.style.display = "none";
+
+      }
+
+    });
+
+
+    // Open Camera
+
+    cameraBtn.addEventListener("click", async () => {
+
+      try {
+
+        cameraStream =
+          await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: "user"
+            },
+            audio: false
+          });
+
+
+        camera.srcObject = cameraStream;
+
+        cameraBox.style.display = "block";
+
+        selfiePreview.style.display = "none";
+
+        cameraBtn.innerText =
+          "📸 ছবি তুলুন";
+
+        selfieStatus.innerText =
+          "ক্যামেরায় আপনার মুখ দেখিয়ে ছবি তুলুন";
+
+
+        cameraBtn.onclick = takeSelfie;
+
+      } catch (error) {
+
+        console.error(error);
+
+        selfieStatus.innerText =
+          "❌ ক্যামেরা চালু করা যায়নি। Camera permission দিন।";
+
+      }
+
+    });
+
+
+    // Take Selfie
+
+    async function takeSelfie() {
+
+      if (!camera.videoWidth) {
+
+        selfieStatus.innerText =
+          "⚠️ ক্যামেরা প্রস্তুত হওয়া পর্যন্ত অপেক্ষা করুন।";
+
+        return;
+
+      }
+
+
+      canvas.width = camera.videoWidth;
+      canvas.height = camera.videoHeight;
+
+
+      const context =
+        canvas.getContext("2d");
+
+
+      // Mirror image naturally for selfie
+
+      context.translate(canvas.width, 0);
+      context.scale(-1, 1);
+
+      context.drawImage(
+        camera,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+
+      const selfieData =
+        canvas.toDataURL("image/jpeg", 0.85);
+
+
+      selfiePreview.src = selfieData;
+
+      selfiePreview.style.display = "block";
+
+      cameraBox.style.display = "none";
+
+
+      // Stop camera
+
+      if (cameraStream) {
+
+        cameraStream
+          .getTracks()
+          .forEach(track => track.stop());
+
+      }
+
+
+      selfieTaken = true;
+
+
+      cameraBtn.style.display = "none";
+
+      retakeBtn.style.display = "block";
+
+      selfieStatus.innerText =
+        "✅ Live Selfie নেওয়া হয়েছে";
+
+
+      checkForm();
+
+    }
+
+
+    // Retake
+
+    retakeBtn.addEventListener("click", () => {
+
+      selfieTaken = false;
+
+      selfiePreview.style.display = "none";
+
+      retakeBtn.style.display = "none";
+
+      cameraBtn.style.display = "block";
+
+      cameraBtn.innerText =
+        "📷 Live Selfie তুলুন";
+
+      cameraBtn.onclick = null;
+
+      selfieStatus.innerText =
+        "নতুন Live Selfie তোলা বাধ্যতামূলক";
+
+
+      checkForm();
+
+    });
+
+
+    // Check Form
+
+    phone.addEventListener("input", checkForm);
+    address.addEventListener("input", checkForm);
+
+
+    function checkForm() {
+
+      const phoneOK =
+        /^01[3-9]\d{8}$/.test(
+          phone.value.trim()
+        );
+
+      const addressOK =
+        address.value.trim().length > 0;
+
+
+      if (
+        selfieTaken &&
+        phoneOK &&
+        addressOK
+      ) {
+
+        saveProfile.disabled = false;
+
+      } else {
+
+        saveProfile.disabled = true;
+
+      }
+
+    }
+
+
+    // Save Profile
+
+    saveProfile.addEventListener("click", () => {
+
+      if (!selfieTaken) {
+
+        status.innerText =
+          "⚠️ Live Selfie নেওয়া বাধ্যতামূলক।";
+
+        return;
+
+      }
+
+
+      const phoneNumber =
+        phone.value.trim();
+
+      const userAddress =
+        address.value.trim();
+
+
+      if (!/^01[3-9]\d{8}$/.test(phoneNumber)) {
+
+        status.innerText =
+          "⚠️ সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন.";
+
+        return;
+
+      }
+
+
+      if (!userAddress) {
+
+        status.innerText =
+          "⚠️ আপনার ঠিকানা দিন.";
+
+        return;
+
+      }
+
+
+      /*
+        আপাতত LocalStorage-এ
+        প্রোফাইলের তথ্য রাখা হচ্ছে।
+      */
+
+      localStorage.setItem(
+        "khidma_phone",
+        phoneNumber
+      );
+
+      localStorage.setItem(
+        "khidma_address",
+        userAddress
+      );
+
+      localStorage.setItem(
+        "khidma_selfie",
+        selfiePreview.src
+      );
+
+
+      status.innerText =
+        "✅ প্রোফাইল তৈরি হয়েছে";
+
+
+      saveProfile.disabled = true;
+
+
+      setTimeout(() => {
+
+        window.location.href =
+          "./home.html";
+
+      }, 700);
+
+    });
+
+  </script>
+
+</body>
+</html>
