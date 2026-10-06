@@ -1,602 +1,694 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>প্রোফাইল তৈরি - ইসলামী খিদমাহ</title>
+<title>ইসলামী খিদমাহ - Profile</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f1f8f4;
-      color: #123d29;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    .container {
-      max-width: 420px;
-      margin: auto;
-      min-height: 100vh;
-      padding: 20px 18px;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f7f5;
+  color: #222;
+}
 
-    .header {
-      text-align: center;
-      padding: 10px 0 18px;
-    }
+.header {
+  background: #087f3f;
+  color: white;
+  padding: 22px 18px;
+  border-radius: 0 0 22px 22px;
+}
 
-    .header h1 {
-      color: #087f3f;
-      margin: 5px 0;
-    }
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
 
-    .card {
-      background: white;
-      padding: 22px 18px;
-      border-radius: 18px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
+.container {
+  padding: 18px;
+}
 
-    .photo {
-      width: 75px;
-      height: 75px;
-      border-radius: 50%;
-      display: block;
-      margin: 0 auto 10px;
-      object-fit: cover;
-      background: #087f3f;
-    }
+.profile-card {
+  background: white;
+  padding: 18px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
 
-    .google-name {
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
+.profile-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 10px;
+}
 
-    .selfie-title {
-      text-align: center;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
+.name {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
 
-    .camera-box {
-      width: 100%;
-      background: #111;
-      border-radius: 14px;
-      overflow: hidden;
-      display: none;
-    }
+.camera-title {
+  margin-top: 20px;
+  font-weight: bold;
+}
 
-    #camera {
-      width: 100%;
-      display: block;
-    }
+video,
+canvas,
+#selfiePreview {
+  width: 100%;
+  max-height: 350px;
+  border-radius: 12px;
+  margin-top: 10px;
+  background: #111;
+}
 
-    #selfiePreview {
-      width: 100%;
-      border-radius: 14px;
-      display: none;
-    }
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #087f3f;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
 
-    .camera-btn,
-    .retake-btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
+button:disabled {
+  opacity: 0.5;
+}
 
-    .camera-btn {
-      background: #087f3f;
-      color: white;
-    }
+input,
+textarea {
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
+}
 
-    .retake-btn {
-      background: #e9eeee;
-      color: #123d29;
-      display: none;
-    }
+label {
+  display: block;
+  margin-top: 16px;
+  font-weight: bold;
+}
 
-    .selfie-status {
-      text-align: center;
-      margin: 10px 0;
-      font-size: 14px;
-    }
+#message {
+  margin-top: 15px;
+  text-align: center;
+  font-weight: bold;
+  line-height: 1.6;
+}
 
-    label {
-      display: block;
-      margin-top: 18px;
-      margin-bottom: 7px;
-      font-weight: bold;
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 16px;
-      outline: none;
-    }
-
-    textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .save-btn {
-      width: 100%;
-      margin-top: 25px;
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      background: #087f3f;
-      color: white;
-      font-size: 17px;
-      font-weight: bold;
-    }
-
-    .save-btn:disabled {
-      opacity: 0.5;
-    }
-
-    #status {
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .required {
-      color: #d00;
-    }
-  </style>
+</style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="header">
+  <h1>☪️ ইসলামী খিদমাহ</h1>
+</div>
 
-    <div class="header">
-      <h1>☪️ ইসলামী খিদমাহ</h1>
-      <p>প্রোফাইল তৈরি করুন</p>
+<div class="container">
+
+  <div class="profile-card">
+
+    <!-- Google Profile -->
+
+    <img
+      id="googlePhoto"
+      class="profile-photo"
+      src=""
+      alt="Profile"
+    >
+
+    <div
+      id="googleName"
+      class="name"
+    >
+      ব্যবহারকারী
     </div>
 
-    <div class="card">
 
-      <img id="profilePhoto" class="photo" alt="Google Photo">
+    <!-- Camera -->
 
-      <div id="googleName" class="google-name">
-        প্রোফাইল লোড হচ্ছে...
-      </div>
-
-
-      <!-- Live Selfie -->
-
-      <div class="selfie-title">
-        📸 Live Selfie <span class="required">*</span>
-      </div>
-
-      <div class="selfie-status" id="selfieStatus">
-        নতুন Live Selfie তোলা বাধ্যতামূলক
-      </div>
-
-      <div class="camera-box" id="cameraBox">
-
-        <video
-          id="camera"
-          autoplay
-          playsinline
-        ></video>
-
-      </div>
-
-      <canvas id="canvas" style="display:none;"></canvas>
-
-      <img
-        id="selfiePreview"
-        alt="Live Selfie Preview"
-      >
-
-      <button
-        class="camera-btn"
-        id="cameraBtn"
-      >
-        📷 Live Selfie তুলুন
-      </button>
-
-      <button
-        class="retake-btn"
-        id="retakeBtn"
-      >
-        🔄 আবার Selfie তুলুন
-      </button>
-
-
-      <label for="phone">
-        📱 মোবাইল নম্বর <span class="required">*</span>
-      </label>
-
-      <input
-        type="tel"
-        id="phone"
-        placeholder="01XXXXXXXXX"
-        maxlength="11"
-      >
-
-
-      <label for="address">
-        📍 আপনার ঠিকানা <span class="required">*</span>
-      </label>
-
-      <textarea
-        id="address"
-        placeholder="আপনার ঠিকানা লিখুন"
-      ></textarea>
-
-
-      <button
-        class="save-btn"
-        id="saveProfile"
-        disabled
-      >
-        প্রোফাইল সংরক্ষণ করুন
-      </button>
-
-      <div id="status"></div>
-
+    <div class="camera-title">
+      📸 লাইভ Selfie
     </div>
+
+    <video
+      id="video"
+      autoplay
+      playsinline
+    ></video>
+
+    <button
+      id="cameraBtn"
+      type="button"
+    >
+      📷 ক্যামেরা চালু করুন
+    </button>
+
+    <button
+      id="captureBtn"
+      type="button"
+      disabled
+    >
+      📸 Selfie নিন
+    </button>
+
+    <canvas
+      id="canvas"
+      style="display:none;"
+    ></canvas>
+
+    <img
+      id="selfiePreview"
+      style="display:none;"
+      alt="Selfie Preview"
+    >
+
+
+    <!-- Phone -->
+
+    <label for="phone">
+      📱 মোবাইল নম্বর
+    </label>
+
+    <input
+      id="phone"
+      type="tel"
+      inputmode="numeric"
+      maxlength="11"
+      placeholder="01XXXXXXXXX"
+    >
+
+
+    <!-- Address -->
+
+    <label for="address">
+      🏠 ঠিকানা
+    </label>
+
+    <textarea
+      id="address"
+      rows="3"
+      placeholder="আপনার ঠিকানা লিখুন"
+    ></textarea>
+
+
+    <!-- Save -->
+
+    <button
+      id="saveBtn"
+      type="button"
+      disabled
+    >
+      💾 Profile Save করুন
+    </button>
+
+    <div id="message"></div>
 
   </div>
 
+</div>
 
-  <script type="module">
 
-    import { auth } from "./firebase.js";
+<script type="module">
 
-    import {
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+/* =========================
+   FIREBASE
+========================= */
 
+import { auth } from "./firebase.js";
 
-    const profilePhoto =
-      document.getElementById("profilePhoto");
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
-    const googleName =
-      document.getElementById("googleName");
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-    const camera =
-      document.getElementById("camera");
 
-    const cameraBox =
-      document.getElementById("cameraBox");
+/* =========================
+   FIRESTORE
+========================= */
 
-    const canvas =
-      document.getElementById("canvas");
+const db = getFirestore();
 
-    const selfiePreview =
-      document.getElementById("selfiePreview");
 
-    const cameraBtn =
-      document.getElementById("cameraBtn");
+/* =========================
+   ELEMENTS
+========================= */
 
-    const retakeBtn =
-      document.getElementById("retakeBtn");
+const googlePhoto =
+  document.getElementById("googlePhoto");
 
-    const selfieStatus =
-      document.getElementById("selfieStatus");
+const googleName =
+  document.getElementById("googleName");
 
-    const phone =
-      document.getElementById("phone");
+const video =
+  document.getElementById("video");
 
-    const address =
-      document.getElementById("address");
+const canvas =
+  document.getElementById("canvas");
 
-    const saveProfile =
-      document.getElementById("saveProfile");
+const selfiePreview =
+  document.getElementById("selfiePreview");
 
-    const status =
-      document.getElementById("status");
+const cameraBtn =
+  document.getElementById("cameraBtn");
 
+const captureBtn =
+  document.getElementById("captureBtn");
 
-    let currentUser = null;
-    let selfieTaken = false;
-    let cameraStream = null;
+const phone =
+  document.getElementById("phone");
 
+const address =
+  document.getElementById("address");
 
-    // Check Google Login
+const saveBtn =
+  document.getElementById("saveBtn");
 
-    onAuthStateChanged(auth, (user) => {
+const message =
+  document.getElementById("message");
 
-      if (!user) {
 
-        window.location.href = "./index.html";
-        return;
+let currentUser = null;
+let cameraStream = null;
+let selfieData = "";
 
-      }
 
-      currentUser = user;
+/* =========================
+   FIREBASE LOGIN CHECK
+========================= */
 
-      googleName.innerText =
-        user.displayName || "ব্যবহারকারী";
+onAuthStateChanged(auth, (user) => {
 
+  if (!user) {
 
-      if (user.photoURL) {
+    window.location.href =
+      "./index.html";
 
-        profilePhoto.src = user.photoURL;
+    return;
+  }
 
-      } else {
+  currentUser = user;
 
-        profilePhoto.style.display = "none";
 
-      }
+  googleName.innerText =
+    user.displayName ||
+    "ব্যবহারকারী";
 
-    });
 
+  if (user.photoURL) {
 
-    // Open Camera
+    googlePhoto.src =
+      user.photoURL;
 
-    cameraBtn.addEventListener("click", async () => {
+  }
 
-      try {
 
-        cameraStream =
-          await navigator.mediaDevices.getUserMedia({
-            video: {
-              facingMode: "user"
-            },
-            audio: false
-          });
+  checkForm();
 
+});
 
-        camera.srcObject = cameraStream;
 
-        cameraBox.style.display = "block";
+/* =========================
+   CAMERA
+========================= */
 
-        selfiePreview.style.display = "none";
+cameraBtn.addEventListener(
+  "click",
+  async () => {
 
-        cameraBtn.innerText =
-          "📸 ছবি তুলুন";
+    try {
 
-        selfieStatus.innerText =
-          "ক্যামেরায় আপনার মুখ দেখিয়ে ছবি তুলুন";
+      cameraStream =
+        await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "user"
+          },
+          audio: false
+        });
 
 
-        cameraBtn.onclick = takeSelfie;
+      video.srcObject =
+        cameraStream;
 
-      } catch (error) {
 
-        console.error(error);
+      captureBtn.disabled =
+        false;
 
-        selfieStatus.innerText =
-          "❌ ক্যামেরা চালু করা যায়নি। Camera permission দিন।";
 
-      }
+      cameraBtn.innerText =
+        "✅ ক্যামেরা চালু হয়েছে";
 
-    });
 
+    }
 
-    // Take Selfie
+    catch (error) {
 
-    async function takeSelfie() {
+      console.error(error);
 
-      if (!camera.videoWidth) {
+      message.innerText =
+        "❌ ক্যামেরা চালু করা যায়নি। Browser Camera Permission Allow করুন.";
 
-        selfieStatus.innerText =
-          "⚠️ ক্যামেরা প্রস্তুত হওয়া পর্যন্ত অপেক্ষা করুন।";
+    }
 
-        return;
+  }
+);
 
-      }
 
+/* =========================
+   TAKE SELFIE
+========================= */
 
-      canvas.width = camera.videoWidth;
-      canvas.height = camera.videoHeight;
+captureBtn.addEventListener(
+  "click",
+  () => {
 
+    if (!cameraStream) {
+      return;
+    }
 
-      const context =
-        canvas.getContext("2d");
 
+    canvas.width =
+      video.videoWidth;
 
-      // Mirror image naturally for selfie
+    canvas.height =
+      video.videoHeight;
 
-      context.translate(canvas.width, 0);
-      context.scale(-1, 1);
 
-      context.drawImage(
-        camera,
-        0,
-        0,
-        canvas.width,
-        canvas.height
+    const ctx =
+      canvas.getContext("2d");
+
+
+    ctx.drawImage(
+      video,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+    selfieData =
+      canvas.toDataURL(
+        "image/jpeg",
+        0.75
       );
 
 
-      const selfieData =
-        canvas.toDataURL("image/jpeg", 0.85);
+    selfiePreview.src =
+      selfieData;
+
+    selfiePreview.style.display =
+      "block";
 
 
-      selfiePreview.src = selfieData;
-
-      selfiePreview.style.display = "block";
-
-      cameraBox.style.display = "none";
+    message.innerText =
+      "✅ Selfie নেওয়া হয়েছে।";
 
 
-      // Stop camera
+    checkForm();
+
+  }
+);
+
+
+/* =========================
+   FORM CHECK
+========================= */
+
+phone.addEventListener(
+  "input",
+  checkForm
+);
+
+address.addEventListener(
+  "input",
+  checkForm
+);
+
+
+function checkForm() {
+
+  const phoneValue =
+    phone.value.trim();
+
+  const addressValue =
+    address.value.trim();
+
+
+  const validPhone =
+    /^01[3-9]\d{8}$/.test(
+      phoneValue
+    );
+
+
+  if (
+    selfieData &&
+    validPhone &&
+    addressValue
+  ) {
+
+    saveBtn.disabled =
+      false;
+
+  }
+
+  else {
+
+    saveBtn.disabled =
+      true;
+
+  }
+
+}
+
+
+/* =========================
+   SAVE PROFILE
+========================= */
+
+saveBtn.addEventListener(
+  "click",
+  async () => {
+
+    if (!currentUser) {
+
+      message.innerText =
+        "❌ User পাওয়া যায়নি।";
+
+      return;
+    }
+
+
+    const phoneValue =
+      phone.value.trim();
+
+    const addressValue =
+      address.value.trim();
+
+
+    if (
+      !/^01[3-9]\d{8}$/.test(
+        phoneValue
+      )
+    ) {
+
+      message.innerText =
+        "❌ সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।";
+
+      return;
+    }
+
+
+    if (!addressValue) {
+
+      message.innerText =
+        "❌ ঠিকানা লিখুন।";
+
+      return;
+    }
+
+
+    if (!selfieData) {
+
+      message.innerText =
+        "❌ আগে Selfie নিন।";
+
+      return;
+    }
+
+
+    saveBtn.disabled =
+      true;
+
+    saveBtn.innerText =
+      "⏳ Firebase-এ Save হচ্ছে...";
+
+
+    try {
+
+      /* =========================
+         FIRESTORE USER DOCUMENT
+      ========================= */
+
+      await setDoc(
+
+        doc(
+          db,
+          "users",
+          currentUser.uid
+        ),
+
+        {
+
+          uid:
+            currentUser.uid,
+
+          name:
+            currentUser.displayName ||
+            "",
+
+          email:
+            currentUser.email ||
+            "",
+
+          photoURL:
+            currentUser.photoURL ||
+            "",
+
+          phone:
+            phoneValue,
+
+          address:
+            addressValue,
+
+          selfie:
+            selfieData,
+
+          role:
+            "customer",
+
+          profileCompleted:
+            true,
+
+          updatedAt:
+            serverTimestamp(),
+
+          createdAt:
+            serverTimestamp()
+
+        },
+
+        {
+          merge: true
+        }
+
+      );
+
+
+      /* =========================
+         LOCAL STORAGE
+      ========================= */
+
+      localStorage.setItem(
+        "khidma_phone",
+        phoneValue
+      );
+
+      localStorage.setItem(
+        "khidma_address",
+        addressValue
+      );
+
+      localStorage.setItem(
+        "khidma_selfie",
+        selfieData
+      );
+
+
+      message.innerText =
+        "✅ Profile সফলভাবে Firebase-এ Save হয়েছে।";
+
+
+      saveBtn.innerText =
+        "✅ Saved";
+
+
+      /* Stop camera */
 
       if (cameraStream) {
 
         cameraStream
           .getTracks()
-          .forEach(track => track.stop());
+          .forEach(
+            track =>
+              track.stop()
+          );
 
       }
 
 
-      selfieTaken = true;
+      /* Go Home */
 
+      setTimeout(
+        () => {
 
-      cameraBtn.style.display = "none";
+          window.location.href =
+            "./home.html";
 
-      retakeBtn.style.display = "block";
+        },
+        1000
+      );
 
-      selfieStatus.innerText =
-        "✅ Live Selfie নেওয়া হয়েছে";
-
-
-      checkForm();
 
     }
 
+    catch (error) {
 
-    // Retake
-
-    retakeBtn.addEventListener("click", () => {
-
-      selfieTaken = false;
-
-      selfiePreview.style.display = "none";
-
-      retakeBtn.style.display = "none";
-
-      cameraBtn.style.display = "block";
-
-      cameraBtn.innerText =
-        "📷 Live Selfie তুলুন";
-
-      cameraBtn.onclick = null;
-
-      selfieStatus.innerText =
-        "নতুন Live Selfie তোলা বাধ্যতামূলক";
+      console.error(
+        "Firestore Error:",
+        error
+      );
 
 
-      checkForm();
-
-    });
-
-
-    // Check Form
-
-    phone.addEventListener("input", checkForm);
-    address.addEventListener("input", checkForm);
+      message.innerText =
+        "❌ Firebase-এ Save হয়নি। আবার চেষ্টা করুন।";
 
 
-    function checkForm() {
+      saveBtn.disabled =
+        false;
 
-      const phoneOK =
-        /^01[3-9]\d{8}$/.test(
-          phone.value.trim()
-        );
-
-      const addressOK =
-        address.value.trim().length > 0;
-
-
-      if (
-        selfieTaken &&
-        phoneOK &&
-        addressOK
-      ) {
-
-        saveProfile.disabled = false;
-
-      } else {
-
-        saveProfile.disabled = true;
-
-      }
+      saveBtn.innerText =
+        "💾 আবার Profile Save করুন";
 
     }
 
+  }
+);
 
-    // Save Profile
-
-    saveProfile.addEventListener("click", () => {
-
-      if (!selfieTaken) {
-
-        status.innerText =
-          "⚠️ Live Selfie নেওয়া বাধ্যতামূলক।";
-
-        return;
-
-      }
-
-
-      const phoneNumber =
-        phone.value.trim();
-
-      const userAddress =
-        address.value.trim();
-
-
-      if (!/^01[3-9]\d{8}$/.test(phoneNumber)) {
-
-        status.innerText =
-          "⚠️ সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন.";
-
-        return;
-
-      }
-
-
-      if (!userAddress) {
-
-        status.innerText =
-          "⚠️ আপনার ঠিকানা দিন.";
-
-        return;
-
-      }
-
-
-      /*
-        আপাতত LocalStorage-এ
-        প্রোফাইলের তথ্য রাখা হচ্ছে।
-      */
-
-      localStorage.setItem(
-        "khidma_phone",
-        phoneNumber
-      );
-
-      localStorage.setItem(
-        "khidma_address",
-        userAddress
-      );
-
-      localStorage.setItem(
-        "khidma_selfie",
-        selfiePreview.src
-      );
-
-
-      status.innerText =
-        "✅ প্রোফাইল তৈরি হয়েছে";
-
-
-      saveProfile.disabled = true;
-
-
-      setTimeout(() => {
-
-        window.location.href =
-          "./home.html";
-
-      }, 700);
-
-    });
-
-  </script>
+</script>
 
 </body>
-</html>
+  </html>
