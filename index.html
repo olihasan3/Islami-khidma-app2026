@@ -81,6 +81,11 @@
       transform: scale(0.98);
     }
 
+    .google-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     .safe {
       text-align: center;
       font-size: 13px;
@@ -121,6 +126,7 @@
 
   </div>
 
+
   <script type="module">
 
     import { auth } from "./firebase.js";
@@ -130,11 +136,17 @@
       signInWithPopup
     } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
+
     const googleLogin = document.getElementById("googleLogin");
+
 
     googleLogin.addEventListener("click", async () => {
 
       const provider = new GoogleAuthProvider();
+
+      googleLogin.disabled = true;
+      googleLogin.innerText = "Login হচ্ছে...";
+
 
       try {
 
@@ -142,13 +154,24 @@
 
         const user = result.user;
 
-        alert("স্বাগতম " + user.displayName);
+        alert("স্বাগতম " + (user.displayName || "ব্যবহারকারী"));
+
+
+        // Login সফল হলে Customer Home Page-এ যাবে
+        window.location.href = "./home.html";
+
 
       } catch (error) {
 
         console.error(error);
 
-        alert("Google Login করা যায়নি। আবার চেষ্টা করুন।");
+        googleLogin.disabled = false;
+        googleLogin.innerText = "🔵 Google দিয়ে শুরু করুন";
+
+        alert(
+          "Google Login করা যায়নি। আবার চেষ্টা করুন।\n\n" +
+          error.message
+        );
 
       }
 
